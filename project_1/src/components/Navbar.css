@@ -1,0 +1,22 @@
+.header
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+.navMenu
+{
+    display: flex;
+}
+
+.navMenu li 
+{
+    padding: 0 1rem;
+}
+
+.navMenu li a
+{
+    font-size: 1.2rem;
+    font-weight: 500;
+}

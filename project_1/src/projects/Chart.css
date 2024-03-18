@@ -1,0 +1,20 @@
+.chart1 {
+    border: 2px solid black;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.chart2 {
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+.chart1:hover{
+    border: 3.5px solid black;
+    cursor: pointer;
+}
+
+.chart2:hover{
+    border: 3.5px solid black;
+    cursor: pointer;
+}

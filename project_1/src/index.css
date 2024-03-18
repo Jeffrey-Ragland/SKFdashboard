@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* for blink animation */
+@keyframes blink
+{
+    0%
+    {
+        color:gray;
+    }
+    50%
+    {
+        color: red;
+    }
+    100%
+    {
+        color:gray;
+    }
+}
+
+@keyframes backgroundBlink
+{
+    0%
+    {
+        background-color: gray;
+    }
+    50%
+    {
+        background-color: red;
+    }
+    100%
+    {
+        background-color: gray;
+    }
+}
+
+.animate-blink
+{
+    animation: blink 1s infinite;
+}
+
+.animate-background-blink
+{
+    animation: backgroundBlink 1s infinite;
+}
+
+/* body
+{
+    background-color: rgb(255, 255, 234); */
+    /* background-color: rgb(255, 229, 255);
+    background-image: url('white.jpg');
+    background-size: cover;
+    background-position: center;
+} */

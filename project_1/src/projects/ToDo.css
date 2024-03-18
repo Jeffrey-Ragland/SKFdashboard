@@ -1,0 +1,24 @@
+.container{
+    border: 1px solid black;
+    margin: auto;
+    width: 250px;
+    padding: 1.5rem;
+}
+
+#heading
+{
+    text-align: center;
+}
+
+#taskbox
+{
+    border: 1px solid black;
+    height: 10px;
+    width: 140px;
+    padding: 0.7rem;
+
+}
+
+#delbutton{
+    margin-left: 2rem;
+}
