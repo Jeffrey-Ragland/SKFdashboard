@@ -5,6 +5,7 @@ import ReactApexChart from 'react-apexcharts'
 import {AiOutlineWarning } from "react-icons/ai";
 import { MdFileDownload } from "react-icons/md";
 import xymaimg from './xyma.png'
+import coverImg from './pdfcover.jpg'
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'
 
@@ -274,6 +275,12 @@ const DashAdmin = () => {
     {
       const doc = new jsPDF();
       const img = xymaimg;
+      const cover = coverImg;
+
+      //cover img
+      doc.addImage(cover,'JPG',0,0,210,297);
+
+      doc.addPage();
 
       //logo
       doc.addImage(img, 'PNG', 10,10,40,20 );
@@ -282,8 +289,11 @@ const DashAdmin = () => {
           head: [['S.No','Sensor 1','Sensor 2','Sensor 3','Sensor 4','Sensor 5','Created At']],
           body: pdfData.map(({Sensor1,Sensor2,Sensor3,Sensor4,Sensor5,Time},index)=>[index + 1, Sensor1,Sensor2,Sensor3,Sensor4,Sensor5,Time]),
           startY: 40,
+          headerStyles: {
+            fillColor: [222, 121, 13]
+        }
       });
-      doc.save('sensorDataAll.pdf');
+      doc.save('sensor_adminData.pdf');
       
 
     };

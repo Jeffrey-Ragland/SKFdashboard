@@ -99,10 +99,6 @@ return (
 
     </div>
 
-    {/* top right corner content */}
-    <div className='absolute top-0 right-0 mt-8 mr-4 flex items-center'>
-        {children}
-    </div>
     </div>
 )
 
