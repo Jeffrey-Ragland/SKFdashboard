@@ -6,32 +6,31 @@ import {AiOutlineWarning } from "react-icons/ai";
 import { MdFileDownload } from "react-icons/md";
 import xymaimg from './xyma.png'
 import coverImg from './pdfcover.jpg'
+import sensorPage from './utmapsPage.jpg'
+import disclaimerPage from './disclaimerPage.jpg'
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'
 
-
 const DashAdmin = () => {
 
-    
-    const [selectedGraph, setSelectedGraph] = useState([]); //graphs
-    const [sensorData, setSensorData] = useState({}); // graph data
-    const [series, setSeries] = useState([]); //graph options
-    const [activeStatus, setActiveStatus] = useState('Active') //activity status
-    const[pdfData, setPdfData] = useState([]); //pdf download
-    const[tableData, setTableData] = useState([]) //for table
+  const [selectedGraph, setSelectedGraph] = useState([]); //graphs
+  const [sensorData, setSensorData] = useState({}); // graph data
+  const [series, setSeries] = useState([]); //graph options
+  const [activeStatus, setActiveStatus] = useState('Active') //activity status
+  const[pdfData, setPdfData] = useState([]); //pdf download
+  const[tableData, setTableData] = useState([]) //for table
 
+  //logout
+  const handleLogout = () =>
+  {
+      localStorage.removeItem('token');
+  }
 
-    const handleLogout = () =>
-    {
-        localStorage.removeItem('token');
-    }
-
-    
   // use effect for line graph
   useEffect(() => 
   {
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 1000); 
+    const interval = setInterval(fetchSensorData, 3000); 
     return () => clearInterval(interval); 
   }, [selectedGraph]);
 
@@ -83,13 +82,12 @@ const DashAdmin = () => {
 
   // for activity status
   const fetchSensorData2 = async () =>
-    {
+  {
         try
         {
         const response = await axios.get('http://localhost:3001/read');
         if(response.data.success)
         {
-  
             // for activity status
             const modifiedData = response.data.data.map(item =>
                 {
@@ -114,7 +112,6 @@ const DashAdmin = () => {
                 checkStatus(modifiedData); 
 
                 // for pdf download  
-                
                 setPdfData(response.data.data);
                 console.log('pdf data',pdfData)
         }
@@ -127,8 +124,7 @@ const DashAdmin = () => {
         {
             console.log(error);
         }
-
-    };
+  };
 
   // for table
   const fetchSensorData3 = async () =>
@@ -153,7 +149,6 @@ const DashAdmin = () => {
   };
  
   // function for checking the activity status
-
   const checkStatus = (data) =>
   {
       if(data.length > 0)
@@ -190,9 +185,9 @@ const DashAdmin = () => {
     }
   },[sensorData]);
 
-
-  
+  //handle graph selection
   const handleGraphChange = (event) => {
+
     const graph = event.target.value;
 
     if(selectedGraph.includes(graph))
@@ -203,12 +198,10 @@ const DashAdmin = () => {
     {
       setSelectedGraph([...selectedGraph, graph]);
     }
-
   };
     
     const setSeriesData = () => 
     {
-
     let newSeries = [];
 
     selectedGraph.forEach(graph => {
@@ -231,7 +224,6 @@ const DashAdmin = () => {
     };
 
     // line graph code
-
     const [options, setOptions] = useState(
       {
         colors: ['#FF0000','#00FF00', '#0000FF', '#FFFF00', '#FF00FF'],
@@ -253,7 +245,6 @@ const DashAdmin = () => {
               fontSize: '8px',
             }
           }
-
         },
         yaxis: {
           title: {
@@ -262,10 +253,6 @@ const DashAdmin = () => {
         },
         legend: {
           position: 'right',
-          // offsetY: 0,
-          // itemMargin: {
-          //   vertical: 0
-          // }
         }
       }
     );
@@ -274,17 +261,26 @@ const DashAdmin = () => {
     const generatepdf = () =>
     {
       const doc = new jsPDF();
-      const img = xymaimg;
+      const logo = xymaimg;
       const cover = coverImg;
+      const  desc = sensorPage;
+      const disclaimer = disclaimerPage;
 
-      //cover img
-      doc.addImage(cover,'JPG',0,0,210,297);
+      //cover img  
+      doc.addImage(cover, 'JPG',0,0,210,297);
+      doc.addPage(); 
 
+      //logo
+      doc.addImage(logo, 'PNG', 10,10,40,20 );
+      
+      //sensor description
+      doc.addImage(desc, 'PNG', 0,40,220,250);
       doc.addPage();
 
       //logo
-      doc.addImage(img, 'PNG', 10,10,40,20 );
+      doc.addImage(logo, 'PNG', 10,10,40,20 );
 
+      //table
       doc.autoTable({
           head: [['S.No','Sensor 1','Sensor 2','Sensor 3','Sensor 4','Sensor 5','Created At']],
           body: pdfData.map(({Sensor1,Sensor2,Sensor3,Sensor4,Sensor5,Time},index)=>[index + 1, Sensor1,Sensor2,Sensor3,Sensor4,Sensor5,Time]),
@@ -293,16 +289,22 @@ const DashAdmin = () => {
             fillColor: [222, 121, 13]
         }
       });
-      doc.save('sensor_adminData.pdf');
-      
+      doc.addPage();
 
+      //logo
+      doc.addImage(logo, 'PNG', 10,10,40,20 );
+
+      //disclaimer
+      doc.addImage(disclaimer,'PNG',0,50,210,250)
+
+      doc.save('sensor_adminData.pdf');
     };
 
+    //for custom scrollbar in table
     const customScrollbarStyle = {
       scrollbarWidth: 'thin',
       scrollbarColor: 'rgba(0, 0, 0, 0.3) transparent',
     };
-
 
   return (
     <div className='p-3'>
@@ -322,9 +324,7 @@ const DashAdmin = () => {
       </div>
 
       {/* check boxes */}
-
       <div className='mt-4 w-full xs:flex justify-between'>
-         
          <div className='flex ml-5 gap-1'>
             {[1,2, 3, 4, 5].map(graph => (
                     <div key={graph} className='flex items-center p-1 h-8 rounded-lg mb-4 text-white bg-orange-400 hover:bg-orange-500 cursor-pointer hover:scale-105 duration-200 text-xs'>
@@ -342,9 +342,8 @@ const DashAdmin = () => {
                 ))}
           </div>
 
-          {/* activity status and pdf button */}
-
-          <div className='flex items-start'>
+      {/* activity status and pdf button */}
+      <div className='flex items-start'>
             <div className={`flex items-center h-8 p-2 ml-5 text-white cursor-pointer rounded-md text-xs font-medium hover:scale-110 duration-200 ${activeStatus === 'Active' ? ' bg-green-400' : ' bg-red-400 animate-background-blink' }`}>
               <div><AiOutlineWarning size={25}/></div>
               <div>{activeStatus}</div>
@@ -360,65 +359,47 @@ const DashAdmin = () => {
       <div className='cursor-pointer'>
         <div>
           <h3 className='text-center font-semibold'> Sensor Temperature Variation</h3>
-          <div className='h-[290px] 2xl:h-[500px]'>
+          <div className='h-[290px] 2xl:h-[500px] shadow-2xl rounded-xl bg-white'>
           <ReactApexChart options={options} series={series} type='line' height={'100%'}/>
           </div>
         </div>
       </div>
 
-      {/* table conetnt */}
-
-      <div className='w-full h-[172px] 2xl:h-[250px] mt-4 overflow-auto' style={customScrollbarStyle} >
-        
+      {/* table content */}
+      <div className='w-full h-[130px] 2xl:h-[250px] mt-4' style={customScrollbarStyle} >
         <h3 className='text-center font-medium mb-2'>Sensor Data</h3>
-        
-        
+        <div className='h-full overflow-auto shadow-2xl rounded-xl bg-white'>
         <table className='w-full'>
           <thead className='sticky top-0'>
-            <tr className='border border-black text-center bg-blue-300 '>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> S.No </th>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> Sensor 1 </th>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> Sensor 2 </th>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> Sensor 3 </th>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> Sensor 4 </th>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> Sensor 5 </th>
-              <th className='border border-black hover:bg-blue-400 cursor-pointer'> Created At </th>
+            <tr className='border border-black text-center bg-blue-400 '>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> S.No </th>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> Sensor 1 </th>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> Sensor 2 </th>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> Sensor 3 </th>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> Sensor 4 </th>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> Sensor 5 </th>
+              <th className='border border-black hover:bg-blue-500 cursor-pointer'> Created At </th>
             </tr>
           </thead>
           <tbody>
             {tableData.map((item, index) =>
             (
               <tr key={item.id} className='border border-black text-center text-xs'>
-                <td className='border border-black bg-blue-300 hover:bg-blue-400 cursor-pointer py-[5px]'> {index + 1} </td>
-                <td className='border border-black bg-gray-200 hover:bg-gray-300 hover:cursor-pointer hover:text-base'> {item.Sensor1} </td>
-                <td className='border border-black bg-gray-200 hover:bg-gray-300 hover:cursor-pointer hover:text-base'> {item.Sensor2} </td>
-                <td className='border border-black bg-gray-200 hover:bg-gray-300 hover:cursor-pointer hover:text-base'> {item.Sensor3} </td>
-                <td className='border border-black bg-gray-200 hover:bg-gray-300 hover:cursor-pointer hover:text-base'> {item.Sensor4} </td>
-                <td className='border border-black bg-gray-200 hover:bg-gray-300 hover:cursor-pointer hover:text-base'> {item.Sensor5} </td>
-                <td className='border border-black bg-gray-200 hover:bg-gray-300 hover:cursor-pointer'> {item.Time} </td>
+                <td className='border border-black bg-blue-400 hover:bg-blue-500 cursor-pointer py-[5px]'> {index + 1} </td>
+                <td className='border border-black bg-white hover:bg-gray-200 hover:cursor-pointer hover:text-base'> {item.Sensor1} </td>
+                <td className='border border-black bg-white hover:bg-gray-200 hover:cursor-pointer hover:text-base'> {item.Sensor2} </td>
+                <td className='border border-black bg-white hover:bg-gray-200 hover:cursor-pointer hover:text-base'> {item.Sensor3} </td>
+                <td className='border border-black bg-white hover:bg-gray-200 hover:cursor-pointer hover:text-base'> {item.Sensor4} </td>
+                <td className='border border-black bg-white hover:bg-gray-200 hover:cursor-pointer hover:text-base'> {item.Sensor5} </td>
+                <td className='border border-black bg-white hover:bg-gray-200 hover:cursor-pointer'> {item.Time} </td>
               </tr>
             ))}
           </tbody>
         </table>
-      
+        </div>
       </div>
-
     </div>
   )
 }
 
 export default DashAdmin
-
-
-
-
-
-// axios.post('http://localhost:3001/logout')
-        // .then(response =>
-        //     {
-        //         localStorage.removeItem('token');
-        //     })
-        // .catch(error =>
-        //     {
-        //         console.error('error logging out',error);
-        //     })

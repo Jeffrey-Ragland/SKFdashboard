@@ -7,7 +7,6 @@ const apiTokenModel = require('./models/ApiTokenSchema')
 const queryModel = require('./models/QueriesSchema')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-//const cookieParser = require('cookie-parser')
 
 const app = express()
 app.use(express.json())
@@ -16,31 +15,9 @@ app.use(cors({
     methods: ["GET", "POST"],
     credentials: true
 }))
-//app.use(cookieParser())
 
 mongoose.connect('mongodb://127.0.0.1:27017/employee');
 
-//login authentication
-// const verifyUser = (req,res, next) =>
-// {
-//     const token = req.headers.authorization;
-
-//     if(!token)
-//     {
-//         return res.json("token  not available")
-//     }
-//     else
-//     {
-//         jwt.verify(token.split(' ')[1],"jwt-secret-key",(err,decoded) =>
-//         {
-//            if(err) return res.json("wrong token")
-//            next(); 
-//         })
-//     }
-// }
-// app.get('/dashmain',verifyUser);
-
- 
 // api authentication  
 
 const verifyToken = (req, res, next) =>
@@ -77,12 +54,6 @@ const verifyToken = (req, res, next) =>
     }
 }
 
-
-// app.post('/logout',(req,res) =>
-// {
-//     res.json({message: 'logout successful'});
-// });
-
 // http://localhost:3001/signup
 
 app.post('/signup',(req,res) =>
@@ -99,6 +70,7 @@ app.post('/signup',(req,res) =>
     
 })
 
+//for login
 app.post("/login", (req,res) =>
 {
     const {Email, Password} = req.body;
@@ -142,8 +114,7 @@ app.post("/login", (req,res) =>
 })
 
 
-//sensor db crud
-
+//sensor DB CRUD
 
 //create
 //http://localhost:3001/create?Sensor1=10&Sensor2=30&Sensor3=30&Sensor4=40&Sensor5=50
@@ -175,8 +146,7 @@ app.get("/create",verifyToken, (req,res) =>
    
 })
 
-
-//read //used in dashmain,dashreports->download pdf, dashadmin->activity status and pdf
+//read //used in dashmain->chart,activity status; dashreports->download pdf; dashadmin->activity status and pdf
 //http://localhost:3001/read
 
 app.get("/read", async(req,res) =>
@@ -192,8 +162,9 @@ app.get("/read", async(req,res) =>
     }
 })
 
-//read //used in dashadmin-> table
+//read //used in dashadmin->table
 //http://localhost:3001/readLimit
+
 app.get("/readLimit", async(req,res) =>
 {
     const id= req.params.id;
@@ -207,13 +178,30 @@ app.get("/readLimit", async(req,res) =>
     }
 })
 
-//read for line chart/ dashgraph
+//read //used in dashmain-> table
+//http://localhost:3001/readLimitMain
+
+app.get("/readLimitMain", async(req,res) =>
+{
+    const id= req.params.id;
+    //const data = await sensorModel.findById(id);
+    const data = await sensorModel.find().sort({_id: -1}).limit(30);
+    
+    if (data) {
+        res.json({ success: true, data: data});
+    } else {
+        res.json({ success: false, message: "Data not found" });
+    }
+})
+
+//read //used in dashgraph->line chart
 //http://localhost:3001/readSensor/1
 
 app.get("/readSensor/:sensorId", async(req, res) =>
 {
     const sensorId = req.params.sensorId;
-    const data = await sensorModel.find().sort({_id: -1}).limit(30).select(`Sensor${sensorId} Time`);
+    const limit = parseInt(req.query.limit); //data limit
+    const data = await sensorModel.find().sort({_id: -1}).limit(limit).select(`Sensor${sensorId} Time`);
     
     if(data)
     {
@@ -226,8 +214,9 @@ app.get("/readSensor/:sensorId", async(req, res) =>
 
 })
 
-// read for dashadmin -> line graph
+// read //used in dashadmin -> line graph
 //http://localhost:3001/readSensorAdmin/1
+
 app.get("/readSensorAdmin/:sensorId", async(req, res) =>
 {
     const sensorId = req.params.sensorId;
@@ -243,7 +232,6 @@ app.get("/readSensorAdmin/:sensorId", async(req, res) =>
     }
 
 })
-
 
 //update 
 //http://localhost:3001/update
@@ -269,14 +257,11 @@ app.delete("/delete/:id", async (req,res) =>
 })
 
 //api token generation 
-
-// http://localhost:3001/generatetoken
+//http://localhost:3001/generatetoken
 
 app.post('/generatetoken', (req, res) =>
 {
     const token = jwt.sign({}, 'jwtsecrettoken', {expiresIn: '1d'});
-   // res.json({token});
-
     const newToken = new apiTokenModel({Token: token});
 
     newToken.save()
@@ -291,8 +276,7 @@ app.post('/generatetoken', (req, res) =>
 });
 
 //query handling in dashsettings
-
-// http://localhost:3001/query
+//http://localhost:3001/query
 
 app.post('/query', (req,res) =>
 {

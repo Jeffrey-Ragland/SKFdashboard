@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* for blink animation */
+/* for blink animation */ 
+/* dashmain-> activity status */
 @keyframes blink
 {
     0%
@@ -19,6 +20,7 @@
     }
 }
 
+/* dashadmin-> activity status */
 @keyframes backgroundBlink
 {
     0%
@@ -45,11 +47,8 @@
     animation: backgroundBlink 1s infinite;
 }
 
-/* body
+/* bg color for dashboard */
+body
 {
-    background-color: rgb(255, 255, 234); */
-    /* background-color: rgb(255, 229, 255);
-    background-image: url('white.jpg');
-    background-size: cover;
-    background-position: center;
-} */
+    background-color: rgb(255, 255, 234); 
+}
