@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from  'mongoose';
 
 const ApiTokenSchema = new mongoose.Schema(
     {
@@ -10,4 +10,4 @@ const ApiTokenSchema = new mongoose.Schema(
 )
 
 const apiTokenModel = mongoose.model('apiToken',ApiTokenSchema);
-module.exports = apiTokenModel;
+export default apiTokenModel

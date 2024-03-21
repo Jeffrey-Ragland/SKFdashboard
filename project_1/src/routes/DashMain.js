@@ -36,7 +36,7 @@ const DashMain = () => {
     {
         try
         {
-        const response = await axios.get('http://localhost:3001/read');
+        const response = await axios.get('http://localhost:3001/backend/read');
         if(response.data.success)
         {
             setSensorData(response.data.data); // for bar chart
@@ -81,7 +81,7 @@ const DashMain = () => {
     {
     try
     {
-        const response = await axios.get('http://localhost:3001/readLimitMain')
+        const response = await axios.get('http://localhost:3001/backend/readLimitMain')
         
           if(response.data.success)
           {
@@ -189,7 +189,7 @@ const DashMain = () => {
     //for custom scrollbar in table
     const customScrollbarStyle = {
         scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(0, 0, 0, 0.3) transparent',
+        scrollbarColor: 'orange transparent',
       };
     
   return (
@@ -288,9 +288,9 @@ const DashMain = () => {
                 </div>
 
                 {/* table */}
-                <div className='mt-1 h-[140px] 2xl:h-[290px] w-full cursor-pointer' style={customScrollbarStyle}>
+                <div className='mt-1 h-[140px] 2xl:h-[290px] w-full cursor-pointer'>
                     <h3 className='text-center font-medium mb-2'>Sensor Data</h3>
-                    <div className='h-full overflow-auto shadow-2xl rounded-xl bg-white'>
+                    <div className='h-full overflow-auto shadow-2xl rounded-xl bg-white ' style={customScrollbarStyle}>
                     <table className='w-full'>
                         <thead className='sticky top-0'>
                             <tr className='border border-black text-center bg-orange-400  text-xs'>

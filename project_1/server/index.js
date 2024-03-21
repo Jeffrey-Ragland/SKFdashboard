@@ -1,62 +1,13 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-const EmployeeModel = require('./models/EmpSchema')
-const sensorModel = require('./models/SensorSchema')
-const apiTokenModel = require('./models/ApiTokenSchema')
-const queryModel = require('./models/QueriesSchema')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+import EmployeeModel from './models/EmpSchema.js';
+import sensorModel from './models/SensorSchema.js';
+import apiTokenModel from './models/ApiTokenSchema.js';
+import queryModel from './models/QueriesSchema.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-const app = express()
-app.use(express.json())
-app.use(cors({
-    origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
-    credentials: true
-}))
 
-mongoose.connect('mongodb://127.0.0.1:27017/employee');
-
-// api authentication  
-
-const verifyToken = (req, res, next) =>
-{
-    const bearerHeader = req.headers['authorization'];
-
-    if(typeof bearerHeader !== 'undefined')
-    {
-        const bearer = bearerHeader.split(' ');
-        const bearerToken = bearer[1];
-        req.token= bearerToken;
-       
-        apiTokenModel.findOne({Token: bearerToken})
-        .then(token =>
-            {
-                if(token)
-                {
-                    next();
-                }
-                else
-                {
-                    res.sendStatus(403);
-                }
-            }) 
-            .catch(error=>
-                {
-                    res.status(500).json({error: error.message});
-                });
-    }
-
-    else
-    {
-        res.sendStatus(403);
-    }
-}
-
-// http://localhost:3001/signup
-
-app.post('/signup',(req,res) =>
+//http://localhost:3001/backend/signup
+export const signup = (req,res) =>
 {
     const {Email,Password} = req.body;
     bcrypt.hash(Password, 10)
@@ -68,10 +19,10 @@ app.post('/signup',(req,res) =>
         })
     .catch(err => console.log(err.message))
     
-})
+};
 
 //for login
-app.post("/login", (req,res) =>
+export const login = (req,res) =>
 {
     const {Email, Password} = req.body;
     EmployeeModel.findOne({Email: Email})
@@ -111,45 +62,68 @@ app.post("/login", (req,res) =>
             }
         })
         .catch(err => console.log(err));
-})
-
+};
 
 //sensor DB CRUD
 
 //create
-//http://localhost:3001/create?Sensor1=10&Sensor2=30&Sensor3=30&Sensor4=40&Sensor5=50
-
-app.get("/create",verifyToken, (req,res) =>
+//http://localhost:3001/backend/create?Sensor1=10&Sensor2=30&Sensor3=30&Sensor4=40&Sensor5=50
+export const create = (req,res) =>
 {
-    jwt.verify(req.token, 'jwtsecrettoken', (err) =>
+    const bearerHeader = req.headers['authorization'];
+
+    if(typeof bearerHeader !== 'undefined')
     {
-        if(err)
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+
+        jwt.verify(bearerToken, 'jwtsecrettoken', (err, decoded) =>
         {
-            res.sendStatus(403);
-        }
-        else
-        {
-            const data = req.query;
-            data.Time = new Date().toLocaleString();
-            const newData = new sensorModel(data);
-            newData.save()
-            .then(savedData =>
+            if(err)
+            {
+                res.sendStatus(403);
+            }
+            else
+            {
+                apiTokenModel.findOne({Token: bearerToken})
+                .then(token =>
                 {
-                    res.send({success : true, message: "data saved", data: savedData});
-                })
-            .catch(error =>
-                {
-                    res.status(500).json({error: error.message});
-                })
-        }
-    })
-   
-})
+                    if(token)
+                    {
+                        const data = req.query;
+                        data.Time = new Date().toLocaleString();
+                        const newData = new sensorModel(data);
+                        newData.save()
+                        .then(savedData =>
+                            {
+                                res.send({success : true, message: "data saved", data: savedData});
+                            })
+                        .catch(error =>
+                            {
+                                res.status(500).json({error: error.message});
+                            });
+                    }
+                    else
+                    {
+                        res.sendStatus(403);
+                    }
+                    })
+                    .catch(error =>
+                        {
+                            res.status(500).json({error: error.message});
+                        });
+                    }
+        });
+    }
+    else
+    {
+        res.sendStatus(403);
+    }
+};
 
 //read //used in dashmain->chart,activity status; dashreports->download pdf; dashadmin->activity status and pdf
-//http://localhost:3001/read
-
-app.get("/read", async(req,res) =>
+//http://localhost:3001/backend/read
+export const read =  async(req,res) =>
 {
     const id= req.params.id;
     //const data = await sensorModel.findById(id);
@@ -160,12 +134,11 @@ app.get("/read", async(req,res) =>
     } else {
         res.json({ success: false, message: "Data not found" });
     }
-})
+};
 
 //read //used in dashadmin->table
-//http://localhost:3001/readLimit
-
-app.get("/readLimit", async(req,res) =>
+//http://localhost:3001/backend/readLimit
+export const readLimit = async(req,res) =>
 {
     const id= req.params.id;
     //const data = await sensorModel.findById(id);
@@ -176,12 +149,11 @@ app.get("/readLimit", async(req,res) =>
     } else {
         res.json({ success: false, message: "Data not found" });
     }
-})
+};
 
 //read //used in dashmain-> table
-//http://localhost:3001/readLimitMain
-
-app.get("/readLimitMain", async(req,res) =>
+//http://localhost:3001/backend/readLimitMain
+export const readLimitMain =  async(req,res) =>
 {
     const id= req.params.id;
     //const data = await sensorModel.findById(id);
@@ -192,12 +164,11 @@ app.get("/readLimitMain", async(req,res) =>
     } else {
         res.json({ success: false, message: "Data not found" });
     }
-})
+};
 
 //read //used in dashgraph->line chart
-//http://localhost:3001/readSensor/1
-
-app.get("/readSensor/:sensorId", async(req, res) =>
+//http://localhost:3001/backend/readSensor/1
+export const readSensorGraph =  async(req, res) =>
 {
     const sensorId = req.params.sensorId;
     const limit = parseInt(req.query.limit); //data limit
@@ -212,12 +183,11 @@ app.get("/readSensor/:sensorId", async(req, res) =>
         res.json({success: false, message: "data not found"});
     }
 
-})
+};
 
 // read //used in dashadmin -> line graph
-//http://localhost:3001/readSensorAdmin/1
-
-app.get("/readSensorAdmin/:sensorId", async(req, res) =>
+//http://localhost:3001/backend/readSensorAdmin/1
+export const readSensorAdmin = async(req, res) =>
 {
     const sensorId = req.params.sensorId;
     const data = await sensorModel.find().sort({_id: -1}).limit(100).select(`Sensor${sensorId} Time`);
@@ -231,35 +201,32 @@ app.get("/readSensorAdmin/:sensorId", async(req, res) =>
         res.json({success: false, message: "data not found"});
     }
 
-})
+};
 
 //update 
-//http://localhost:3001/update
-
-app.put("/update", async(req,res) =>
+//http://localhost:3001/backend/update
+export const update = async(req,res) =>
 {
     console.log(req.body); 
     const {id, ...rest} = req.body
     console.log(rest)
     const data = await sensorModel.updateOne({_id : id},rest)
     res.send({success: true, message: "data updated", data : data})
-})
+};
 
 //delete
-//http://localhost:3001/delete/
-
-app.delete("/delete/:id", async (req,res) => 
+//http://localhost:3001/backend/delete/
+export const remove = async (req,res) => 
 {
     const id = req.params.id
     console.log(id)
     const data = await sensorModel.deleteOne({_id:id})
     res.send({success: true, message: "data deleted", data : data})
-})
+};
 
 //api token generation 
-//http://localhost:3001/generatetoken
-
-app.post('/generatetoken', (req, res) =>
+//http://localhost:3001/backend/generatetoken
+export const generatetoken = (req, res) =>
 {
     const token = jwt.sign({}, 'jwtsecrettoken', {expiresIn: '1d'});
     const newToken = new apiTokenModel({Token: token});
@@ -273,12 +240,11 @@ app.post('/generatetoken', (req, res) =>
             {
                 res.status(500).json({error: error.message});
             });
-});
+};
 
 //query handling in dashsettings
-//http://localhost:3001/query
-
-app.post('/query', (req,res) =>
+//http://localhost:3001/backend/query
+export const query = (req,res) =>
 {
     const {Name, Query } = req.body;
     const newQuery = new queryModel({Name, Query});
@@ -289,9 +255,4 @@ app.post('/query', (req,res) =>
         res.status(201).json({message: "Query stored"})
     })
     .catch(err => res.status(500).json({error: err.message}));
-});
-
-app.listen(3001,() =>
-{
-    console.log('server is running')
-})  
+};

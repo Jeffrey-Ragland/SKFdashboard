@@ -46,7 +46,7 @@ const DashReports = () => {
     {
         try
         {
-            const response = await fetch ('http://localhost:3001/read');
+            const response = await fetch ('http://localhost:3001/backend/read');
             if(response.ok)
             {
                 const jsonData = await response.json();
@@ -171,7 +171,7 @@ const DashReports = () => {
         <DashNav/>
 
         <div className='flex justify-center items-center h-[75vh]'>
-        <div className='flex items-center flex-col w-88 shadow-2xl p-8 bg-white  rounded-xl'>
+        <div className='flex items-center flex-col w-88 shadow-2xl p-8 bg-gray-100  rounded-xl'>
             <div>
                 <h3 className=' mb-2 text-2xl font-thin'>Download Sensor Data</h3>
             </div>
@@ -180,11 +180,11 @@ const DashReports = () => {
             <div>
                 <div className='mt-4'>
                     <div className='mb-1 text-xl font-thin'>From:</div>
-                    <DatePicker className='bg-blue-100 rounded-lg ' selected={fromDate} onChange={handleFromDate} dateFormat={"dd/MM/yyyy"} showIcon/>
+                    <DatePicker className='rounded-lg ' selected={fromDate} onChange={handleFromDate} dateFormat={"dd/MM/yyyy"} showIcon/>
                 </div>
                 <div className='mt-2'>
                     <div className='mb-1 text-xl font-thin'>To:</div>
-                    <DatePicker className='bg-blue-100 rounded-lg' selected={toDate} onChange={handleToDate} dateFormat={"dd/MM/yyyy"} showIcon/>
+                    <DatePicker className='rounded-lg' selected={toDate} onChange={handleToDate} dateFormat={"dd/MM/yyyy"} showIcon/>
                 </div>
             </div>
 

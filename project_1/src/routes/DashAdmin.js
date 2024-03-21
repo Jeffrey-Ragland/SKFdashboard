@@ -56,7 +56,7 @@ const DashAdmin = () => {
     try
     {
       const response = await Promise.all(selectedGraph.map(graph =>
-        axios.get(`http://localhost:3001/readSensorAdmin/${graph}`)
+        axios.get(`http://localhost:3001/backend/readSensorAdmin/${graph}`)
         ));
         const newData = {};
         response.forEach((response, index) =>
@@ -85,7 +85,7 @@ const DashAdmin = () => {
   {
         try
         {
-        const response = await axios.get('http://localhost:3001/read');
+        const response = await axios.get('http://localhost:3001/backend/read');
         if(response.data.success)
         {
             // for activity status
@@ -131,7 +131,7 @@ const DashAdmin = () => {
   {
     try
     {
-        const response = await axios.get('http://localhost:3001/readLimit')
+        const response = await axios.get('http://localhost:3001/backend/readLimit')
         
           if(response.data.success)
           {
@@ -303,7 +303,7 @@ const DashAdmin = () => {
     //for custom scrollbar in table
     const customScrollbarStyle = {
       scrollbarWidth: 'thin',
-      scrollbarColor: 'rgba(0, 0, 0, 0.3) transparent',
+      scrollbarColor: 'rgb(160, 200, 220) transparent ',
     };
 
   return (
@@ -366,10 +366,10 @@ const DashAdmin = () => {
       </div>
 
       {/* table content */}
-      <div className='w-full h-[130px] 2xl:h-[250px] mt-4' style={customScrollbarStyle} >
+      <div className='w-full h-[130px] 2xl:h-[250px] mt-4' >
         <h3 className='text-center font-medium mb-2'>Sensor Data</h3>
-        <div className='h-full overflow-auto shadow-2xl rounded-xl bg-white'>
-        <table className='w-full'>
+        <div className='h-full overflow-auto shadow-2xl rounded-xl bg-white' style={customScrollbarStyle} >
+        <table className='w-full' >
           <thead className='sticky top-0'>
             <tr className='border border-black text-center bg-blue-400 '>
               <th className='border border-black hover:bg-blue-500 cursor-pointer'> S.No </th>

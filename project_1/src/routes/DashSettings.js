@@ -36,7 +36,7 @@ const DashSettings = () => {
 
     try
     {
-      const response = await axios.post('http://localhost:3001/query', {Name, Query});
+      const response = await axios.post('http://localhost:3001/backend/query', {Name, Query});
 
       if(!response.status === 201)
       {
@@ -101,19 +101,19 @@ const DashSettings = () => {
             <div className='ml-2'>
               <div className=' text-center hover:font-normal duration-200'> Asset Information</div>
               <div className='h-[40vh] mb-14  mt-4 rounded-lg overflow-hidden'> 
-              <iframe title='xyma' width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=230&amp;hl=en&amp;q=Xyma%20Analytics%20Pvt%20Ltd,%20+(Xyma)&amp;t=k&amp;z=17&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.gps.ie/">gps devices</a></iframe>
+              <iframe title='xyma' width="100%" height="100%" frameBorder="0" scrolling="no" marginHeight="0" marginWidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=230&amp;hl=en&amp;q=Xyma%20Analytics%20Pvt%20Ltd,%20+(Xyma)&amp;t=k&amp;z=17&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.gps.ie/">gps devices</a></iframe>
               </div>
             </div>
 
             <div className='flex'>
               <div className='w-1/2'>
                 <div className='ml-2 hover:font-normal duration-200'>Asset Type</div>
-                <div className='shadow-lg bg-blue-100 rounded-lg h-10  p-1 ml-2 mt-1 w-3/4 hover:scale-110 duration-200'>Xyma</ div>
+                <div className='shadow-lg bg-white rounded-lg h-10  p-1 ml-2 mt-1 w-3/4 hover:scale-110 duration-200'>Xyma</ div>
               </div>
 
               <div className='w-1/2'>
                 <div className='ml-2 hover:font-normal duration-200'>Location</div>
-                <div className='shadow-lg bg-blue-100 rounded-lg h-10 p-1 ml-2 mt-1 w-3/4 hover:scale-110 duration-200 text-xs overflow-auto'>B4-01, 4th Floor, B Block, IITM RESEARCH PARK, Kanagam, Tharamani, Chennai, Tamil Nadu 600113</div>
+                <div className='shadow-lg bg-white rounded-lg h-10 p-1 ml-2 mt-1 w-3/4 hover:scale-110 duration-200 text-xs overflow-auto'>B4-01, 4th Floor, B Block, IITM RESEARCH PARK, Kanagam, Tharamani, Chennai, Tamil Nadu 600113</div>
               </div>
             </div>
          </div>
@@ -127,11 +127,11 @@ const DashSettings = () => {
       <>
       <div className='text-xl font-light text-center mb-2 hover:font-normal duration-200'> Download Documentation </div>
       <div className='flex font-thin'>
-        <div className='shadow-lg h-[31vh] w-1/2 p-4 mr-2 mb-2 flex flex-col justify-center items-center bg-blue-100 hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' onClick={donwloadUserManual}> <AiOutlineBook size={60}/> User Manual</div>
-        <div className='shadow-lg h-[31vh] w-1/2 p-4 ml-2 flex flex-col justify-center items-center bg-blue-100 hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' >  <MdInsertChartOutlined size={60}/> Schematic</div>
+        <div className='shadow-lg h-[31vh] w-1/2 p-4 mr-2 mb-2 flex flex-col justify-center items-center bg-white hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' onClick={donwloadUserManual}> <AiOutlineBook size={60}/> User Manual</div>
+        <div className='shadow-lg h-[31vh] w-1/2 p-4 ml-2 flex flex-col justify-center items-center bg-white hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' >  <MdInsertChartOutlined size={60}/> Schematic</div>
       </div>
 
-      <div className='font-thin shadow-lg h-[30vh] w-full p-4 mt-2 flex flex-col justify-center items-center bg-blue-100 hover:font-semibold hover:scale-[1.03] cursor-pointer duration-200 rounded-lg'> <AiOutlinePrinter size={60}/> Document</div>
+      <div className='font-thin shadow-lg h-[30vh] w-full p-4 mt-2 flex flex-col justify-center items-center bg-white hover:font-semibold hover:scale-[1.03] cursor-pointer duration-200 rounded-lg'> <AiOutlinePrinter size={60}/> Document</div>
       </>
       );
 
@@ -145,11 +145,11 @@ const DashSettings = () => {
 
       <form onSubmit={handleQuerySubmit}>
       <div className='mb-2 2xl:mb-4'>
-        <input type='text' value={Name} onChange={(e)=> setName(e.target.value)} placeholder='Enter your name...' className='h-[7vh] 2xl:h-[8vh] p-2 w-full rounded-lg font-thin hover:font-normal duration-200 bg-blue-100'/> 
+        <input type='text' value={Name} onChange={(e)=> setName(e.target.value)} placeholder='Enter your name...' className='h-[7vh] 2xl:h-[8vh] p-2 w-full rounded-lg font-thin hover:font-normal duration-200 bg-white'/> 
       </div>
       
       <div> 
-        <textarea value={Query} onChange={(e)=> setQuery(e.target.value)} placeholder='Write your queries here...' className='h-[25vh] 2xl:h-[35vh]  w-full p-2 rounded-lg font-thin hover:font-normal duration-200 bg-blue-100'></textarea>
+        <textarea value={Query} onChange={(e)=> setQuery(e.target.value)} placeholder='Write your queries here...' className='h-[25vh] 2xl:h-[35vh]  w-full p-2 rounded-lg font-thin hover:font-normal duration-200 bg-white'></textarea>
       </div>
       
       <div className='text-right  mt-3 '>
@@ -176,7 +176,7 @@ const DashSettings = () => {
     <div className='max-w-[1640] h-full p-8'>
        <DashNav/>
        <div className='mt-12 grid gap-4 sm:grid-cols-1 lg:grid-cols-2 p-2 '>
-          <div className=' font-thin shadow-2xl xxs:h-[50vh] sm:h-[75vh] bg-blue-100 rounded-xl'>
+          <div className=' font-thin shadow-2xl xxs:h-[50vh] sm:h-[75vh] bg-gray-100 rounded-xl'>
             <div className='grid gap-4 p-4 grid-cols-2'>
               <div className='shadow-lg xxs:h-[21vh] sm:h-[33vh] p-4 flex flex-col justify-center items-center bg-white hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' onClick={()=> handleButtonClick('personalInfo')}><FiUser className='mb-2 ' size={60}/>Personal Info </div>
               <div className='shadow-lg xxs:h-[21vh] sm:h-[33vh] flex flex-col justify-center items-center bg-white hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' onClick={()=> handleButtonClick('assetInfo')} > <FiFile className='mb-2' size={60}/>Asset Info</div>
@@ -184,7 +184,7 @@ const DashSettings = () => {
               <div className='shadow-lg xxs:h-[21vh] sm:h-[33vh] flex flex-col justify-center items-center bg-white hover:font-semibold hover:scale-105 cursor-pointer duration-200 rounded-lg' onClick={()=> handleButtonClick('support')}><FiHelpCircle className='mb-2' size={60}/>Support</div>
             </div>
           </div>
-          <div className='border shadow-2xl bg-white p-4 rounded-xl h-[75vh]'>
+          <div className='border shadow-2xl bg-gray-100 p-4 rounded-xl h-[75vh]'>
               {renderUI()}
           </div>
        </div>

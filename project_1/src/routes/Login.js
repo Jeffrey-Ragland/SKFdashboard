@@ -14,7 +14,7 @@ const Login = () => {
     const handleSubmit = (e) =>
     {
         e.preventDefault()
-        axios.post('http://localhost:3001/login',{Email,Password})
+        axios.post('http://localhost:3001/backend/login',{Email,Password})
         .then(result => 
           {
           console.log(result)

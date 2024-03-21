@@ -29,7 +29,7 @@ const DashGraph = () => {
     try
     {
       const response = await Promise.all(selectedGraph.map(graph =>
-        axios.get(`http://localhost:3001/readSensor/${graph}?limit=${limit}`)
+        axios.get(`http://localhost:3001/backend/readSensor/${graph}?limit=${limit}`)
         ));
     
         const newData = {};

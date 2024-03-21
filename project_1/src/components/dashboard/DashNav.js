@@ -32,64 +32,65 @@ return (
         </div>
     </div>
 
-    
     {/* overlay */}
     {nav ? <div className=' bg-black/65 fixed w-full h-screen top-0 left-0 z-10'></div> : ''}
 
     {/*side menu*/}
     <div className={nav ? 'fixed top-0 left-0  h-screen duration-300 bg-blue-50  z-10 w-[220px] ' : 'fixed top-0 left-[-100%] h-screen duration-300 z-10 w-[220px]'} >
         
+        <div className='h-[18%] flex items-center '>
             <div>
-                <AiOutlineDoubleLeft onClick={()=> setNav(!nav)} size={30} className='absolute right-4 top-10 cursor-pointer hover:scale-125 duration-200'/>
+                <img className='h-[50px] w-[120px] ml-10 mr-4 cursor-pointer hover:scale-110 duration-200' onClick={() => {window.open('https://www.skf.com/', '_blank');}} src={skfimg} alt='/'/>
             </div>
             <div>
-                <img className='h-[50px] w-[120px]  ml-10 mb-4 mt-8 cursor-pointer hover:scale-110 duration-200' onClick={() => {window.open('https://www.skf.com/', '_blank');}} src={skfimg} alt='/'/>
+                <AiOutlineDoubleLeft onClick={()=> setNav(!nav)} size={30} className='cursor-pointer hover:scale-125 duration-200'/>
             </div>
+        </div>
         
-        <nav>
-        <ul className='flex flex-col text-gray-800 p-4'>
-
-            <Link to='/dashmain'>
-            <div className='flex hover:bg-blue-200 hover:scale-110 duration-200'>
+        <div className='flex flex-col h-[64%] border-b border-t border-black   text-gray-800 p-4'>
+            <Link to='/dashmain' className='h-1/5'>
+            <div className='flex items-center w-full h-full hover:bg-blue-200 hover:scale-110 duration-200'>
                 <div className='py-4 mr-2'> <AiOutlineDashboard size={30}/> </div>
-                <li className='text-xl py-4' >  Dashboard</li>
+                <div className='text-xl py-4 2xl:text-2xl' > Dashboard</div>
             </div>
             </Link>
 
-            <Link to='/dashgraph'>
-            <div className='flex hover:bg-blue-200 hover:scale-110 duration-200'>
+            <Link to='/dashgraph' className='h-1/5 '>
+            <div className='flex items-center h-full w-full hover:bg-blue-200 hover:scale-110 duration-200'>
                 <div className='py-4 mr-2'> <AiOutlineLineChart size={30}/> </div>
-                <li className='text-xl py-4' >  Graph </li>
+                <div className='text-xl py-4 2xl:text-2xl' > Graph </div>
             </div>
             </Link>
 
-            <Link to='/dashreports'>
-            <div className='flex hover:bg-blue-200 hover:scale-110 duration-200'>
+            <Link to='/dashreports' className='h-1/5 '>
+            <div className='flex items-center h-full w-full hover:bg-blue-200 hover:scale-110 duration-200'>
                 <div className='py-4 mr-2'> <AiOutlineFileText size={30}/> </div>
-                <li className='text-xl py-4' >   Reports </li>
+                <div className='text-xl py-4 2xl:text-2xl' > Reports </div>
             </div>
             </Link>
 
-            <Link to='/dashsettings'>
-            <div className='flex hover:bg-blue-200 hover:scale-110 duration-200'>
+            <Link to='/dashsettings' className='h-1/5 '>
+            <div className='flex items-center h-full w-full hover:bg-blue-200 hover:scale-110 duration-200'>
                 <div className='py-4 mr-2'> <AiOutlineSetting size={30}/> </div>
-                <li className='text-xl py-4' >   Settings</li>
+                <div className='text-xl py-4 2xl:text-2xl' > Settings</div>
             </div>
             </Link>
             
-            <Link to='/login'>
-            <div className='flex hover:bg-blue-200 hover:scale-110 duration-200' onClick={handleLogout}>
+            <Link to='/login' className='h-1/5 '>
+            <div className='flex items-center h-full w-full hover:bg-blue-200 hover:scale-110 duration-200' onClick={handleLogout}>
                 <div className='py-4 mr-2'> <AiOutlineLogout size={30}/> </div>
-                <li className='text-xl py-4' > Logout</li>
+                <div className='text-xl py-4 2xl:text-2xl' > Logout</div>
             </div>
             </Link>
-        </ul>
-        </nav>
-        <div className='ml-4 mt-8 mb-4'>
-            &copy; All rights reserved by
         </div>
-        <div>
-            <img className='h-[55px] w-[120px] ml-10 cursor-pointer hover:scale-110 duration-200' onClick={() => {window.open('https://www.xyma.in', '_blank');}} src={xymaimg} alt='/'/>
+
+        <div className='h-[18%] flex flex-col items-center justify-center'>
+            <div className='mb-2 mr-6'>  
+                &copy; All rights reserved by
+            </div>
+            <div>
+                <img className='h-[55px] w-[120px] mr-4 cursor-pointer hover:scale-110 duration-200' onClick={() => {window.open('https://www.xyma.in', '_blank');}} src={xymaimg} alt='/'/>
+            </div>
         </div>
     </div>
     </div>
