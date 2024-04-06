@@ -5,6 +5,7 @@ import xymaimg from './xyma.png'
 
 const Login = () => {
 
+    const [Project, setProject] = useState();
     const [Email, setEmail] = useState();
     const [Password, setPassword] = useState();
     const navigate = useNavigate();
@@ -14,13 +15,19 @@ const Login = () => {
     const handleSubmit = (e) =>
     {
         e.preventDefault()
-        axios.post('http://localhost:3001/backend/login',{Email,Password})
+        axios.post('http://localhost:3001/backend/login',{Project,Email,Password})
         .then(result => 
           {
           console.log(result)
           if(result.data.token)
           {
-            localStorage.setItem('token',result.data.token);
+            //localStorage.setItem('token',result.data.token);
+            //localStorage.setItem('role',result.data.role);
+            const tokenRole = JSON.stringify({
+              token: result.data.token,
+              role: result.data.role
+            });
+            localStorage.setItem('token',tokenRole);
             navigate(result.data.redirectUrl);
           }
           else{
@@ -38,15 +45,17 @@ const Login = () => {
       </div>
       <div>
         <form onSubmit={handleSubmit}>
-        <label htmlFor='email' className='text-xl font-light'>Email</label> <br/>
-        <input type='email' id='email' placeholder='Enter Email...' autoComplete='off' className=' mb-4 mt-1 rounded-md p-1 w-full font-thin hover:font-normal duration-200 border border-black' onChange={(e)=> setEmail(e.target.value)} /> <br/>
-        <label htmlFor='pass' className='text-xl font-light' >Password</label> <br/>
-        <input type='password' id='pass' placeholder='Enter Password...' className='mb-8 mt-1 rounded-md p-1 w-full font-thin hover:font-normal duration-200 border border-black' onChange={(e)=> setPassword(e.target.value)}/><br/>
+        <label htmlFor='project' className='text-xl font-light'>Project</label>
+        <input type='text' id='project' placeholder='Enter Project Name...' autoComplete='off' required className=' mb-4 mt-1 rounded-md p-1 w-full font-thin hover:font-normal duration-200 border border-black' onChange={(e)=> setProject(e.target.value)}/>
+        <label htmlFor='email' className='text-xl font-light'>Email</label>
+        <input type='email' id='email' placeholder='Enter Email...' autoComplete='off' required className=' mb-4 mt-1 rounded-md p-1 w-full font-thin hover:font-normal duration-200 border border-black' onChange={(e)=> setEmail(e.target.value)} />
+        <label htmlFor='pass' className='text-xl font-light' >Password</label>
+        <input type='password' id='pass' placeholder='Enter Password...' required className='mb-8 mt-1 rounded-md p-1 w-full font-thin hover:font-normal duration-200 border border-black' onChange={(e)=> setPassword(e.target.value)}/>
         <div className=' text-center mb-4 ' >
           <button  type='submit' className='rounded-md w-full p-1 bg-green-500 text-white hover:scale-105 duration-200'>Login</button>
         </div>
         </form>
-        </div>
+      </div>
     </div>
     </div>
   )

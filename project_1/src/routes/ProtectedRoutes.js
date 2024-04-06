@@ -1,14 +1,50 @@
 import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 
-const ProtectedRoutes = () => {
+const useAuth = () => {
   
-    const token = localStorage.getItem("token");
+    let tokenVariable = localStorage.getItem('token');
 
-    const isAuthenticated = token ? true : false;
-  
-    return isAuthenticated ? ( <Outlet />) : (<Navigate to="/login"/>);
+    const value = JSON.parse(localStorage.getItem('token'));
+    const role = value.role;
+
+    if(tokenVariable)
+    {
+      return{
+        auth: true,
+        role: role,
+      };
+    }
+    else
+    {
+      return{
+        auth: false,
+        role: null,
+      };
+    }
 
   };
+
+  const ProtectedRoutes = (props) =>
+  {
+    const {auth, role} = useAuth();
+
+    if(props.roleRequired) 
+    {
+      return auth ? (
+        props.roleRequired === role ? (
+          <Outlet/>
+        ) : (
+          <Navigate to='/login' />
+        )
+      ) : (
+        <Navigate to='/login'/>
+      )
+    }
+    else
+    {
+      return auth ? <Outlet/> : <Navigate to='/login'/>
+    }
+  }
 
 export default ProtectedRoutes;

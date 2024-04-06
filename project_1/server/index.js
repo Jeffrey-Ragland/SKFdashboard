@@ -9,11 +9,11 @@ import jwt from 'jsonwebtoken';
 //http://localhost:3001/backend/signup
 export const signup = (req,res) =>
 {
-    const {Email,Password} = req.body;
+    const {Project,Email,Password} = req.body;
     bcrypt.hash(Password, 10)
     .then(hash => 
         {
-            EmployeeModel.create({Email,Password: hash})
+            EmployeeModel.create({Project,Email,Password: hash})
             .then(employees => res.json(employees))
             .catch(err => res.json(err))
         })
@@ -24,8 +24,8 @@ export const signup = (req,res) =>
 //for login
 export const login = (req,res) =>
 {
-    const {Email, Password} = req.body;
-    EmployeeModel.findOne({Email: Email})
+    const {Project,Email, Password} = req.body;
+    EmployeeModel.findOne({Project: Project,Email: Email})
     .then(user =>
         {
             if(user)
@@ -35,26 +35,34 @@ export const login = (req,res) =>
                     if(response)
                     {
                         let redirectUrl = '';
-                        if(user.Email === 'skf@xyma.in')
+                        if(user.Project === 'skf')
                         {
                             redirectUrl = '/dashmain';
                         }
-                        else if(user.Email === 'admin@xyma.in')
+                        else if(user.Project === 'admin')
                         {
                             redirectUrl = '/dashadmin'
                         }
-
+                        // token generation
                         const token = jwt.sign({Email: user.Email}, "jwt-secret-key", {expiresIn:"1d"})
+                        // role assignment
+                        let role='';
+                        if(user.Email === 'admin@xyma.in')
+                        {
+                            role = 'admin';
+                        }
+                        else if(user.Email !== 'admin@xyma.in')
+                        {
+                            role = 'client';
+                        }
                 
-                        res.json({token : token, redirectUrl: redirectUrl});
-                        
+                        res.json({token : token, role: role, redirectUrl: redirectUrl}); 
                     }
                     else
                     {
                         res.json("Incorrect Password")
                     }
                 })
-                
             } 
             else
             {

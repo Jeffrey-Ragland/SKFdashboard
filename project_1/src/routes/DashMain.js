@@ -283,7 +283,7 @@ const DashMain = () => {
                         3D Model
                     </h3>
                     <div className='w-full h-[160px] 2xl:h-[300px] overflow-auto shadow-2xl rounded-xl bg-white '>
-                        <CumiModel/>
+                        {/* <CumiModel/> */}
                     </div>
                 </div>
 

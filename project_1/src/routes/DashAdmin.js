@@ -24,6 +24,7 @@ const DashAdmin = () => {
   const handleLogout = () =>
   {
       localStorage.removeItem('token');
+      localStorage.removeItem('role');
   }
 
   // use effect for line graph
