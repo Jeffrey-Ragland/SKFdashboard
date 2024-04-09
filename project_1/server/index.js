@@ -4,7 +4,7 @@ import apiTokenModel from './models/ApiTokenSchema.js';
 import queryModel from './models/QueriesSchema.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
+import mongoose from 'mongoose';
 
 //http://localhost:3001/backend/signup
 export const signup = (req,res) =>
@@ -264,3 +264,37 @@ export const query = (req,res) =>
     })
     .catch(err => res.status(500).json({error: err.message}));
 };
+
+//project creation in dashadmin
+export const createProject = async (req,res) =>
+{
+console.log('request body',req.body);
+{
+    try
+    {
+        const {projectName, email,password,parameterValues} = req.body;
+
+        const ProjectSchema = new mongoose.Schema({
+            //projectName: String,
+            email: String,
+            password: String,
+            parameters: Object
+        });
+        const ProjectModel = mongoose.model(projectName,ProjectSchema,projectName);
+        
+        const projectData = {
+            //projectName: projectName,
+            email: email,
+            password: password,
+            parameters: parameterValues
+        };
+
+        const project = new ProjectModel(projectData);
+        await project.save();
+        res.status(201).send(project);
+    }
+    catch(error)
+    {
+        res.status(400).send(error);
+    }
+}};

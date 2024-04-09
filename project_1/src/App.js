@@ -6,6 +6,7 @@ import DashGraph from "./routes/DashGraph";
 import DashReports from "./routes/DashReports";
 import DashSettings from "./routes/DashSettings";
 import DashAdmin from "./routes/DashAdmin";
+import SkfAdmin from "./routes/SkfAdmin";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="dashsettings" element={<DashSettings />} />
           <Route path="/" element={<ProtectedRoutes roleRequired='admin'/>}>
             <Route path="dashadmin" element={<DashAdmin />} />
+            <Route path="skfadmin" element={<SkfAdmin />} />
           </Route>
         </Route>
 

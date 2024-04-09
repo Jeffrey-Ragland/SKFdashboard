@@ -5,11 +5,13 @@ const useAuth = () => {
   
     let tokenVariable = localStorage.getItem('token');
 
-    const value = JSON.parse(localStorage.getItem('token'));
-    const role = value.role;
+    
 
     if(tokenVariable)
     {
+      const value = JSON.parse(localStorage.getItem('token'));
+      const role = value.role;
+
       return{
         auth: true,
         role: role,
