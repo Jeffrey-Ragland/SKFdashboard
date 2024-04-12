@@ -11,7 +11,8 @@ import {signup,
         remove,
         generatetoken,
         query,
-        createProject} from './index.js';
+        createProject,
+        insertProjectData} from './index.js';
 
 
 const router = express.Router();
@@ -29,5 +30,6 @@ router.delete('/delete/:id',remove);
 router.post('/generatetoken',generatetoken); //api token generation
 router.post('/query',query); //dashSettings->customer support
 router.post('/createproject',createProject); //dashadmin->add data
+router.get('/insertProjectData',insertProjectData);
 
 export default router;

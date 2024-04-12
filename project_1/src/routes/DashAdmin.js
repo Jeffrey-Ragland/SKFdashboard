@@ -15,13 +15,6 @@ const handleLogout = () =>
 const [popupOpen, setPopupOpen] = useState(false);
 const [text, setText] = useState('Add Data')
 const [parameters, setParameters] = useState(0);
-const [formData, setFormData] = useState({
-                                          projectName: '',
-                                          email: '',
-                                          password: '',
-                                          parameters: 0,
-                                          parameterValues: []
-                                          });
 
 const handlePopup = () =>
 {
@@ -41,34 +34,46 @@ const handleParameters = (e) =>
 {
   const value = parseInt(e.target.value);
   setParameters(isNaN(value) ? 0 : value);
-  setFormData({...formData, parameters: isNaN(value) ? 0 : value});
 }
-
-const handleInputChange = (e) =>
-{
-  const {name,value} = e.target;
-
-  if(name.startsWith('parameter'))
-  {
-    const index = parseInt(name.replace('parameter','')) - 1;
-    const newParameterValues = [...formData.parameterValues];
-    newParameterValues[index] = value;
-    setFormData({...formData, parameterValues: newParameterValues});
-  }
-  else
-  {
-    setFormData({...formData, [name]: value});
-  }
-};
 
 const handleSubmit = async(e) =>
 {
   e.preventDefault();
   try
   {
-    const response = await axios.post('http://localhost:3001/backend/createproject',formData);
+    //for createproject backend api
+    const formData = {
+      projectName: e.target.projectName.value,
+      email: e.target.email.value,
+      password: e.target.password.value,
+      parameters: parameters,
+      parameterValues: []
+    };  
+    for (let i = 1; i <= parameters; i++) 
+    {
+      formData.parameterValues.push(e.target[`parameter${i}`].value);
+    }
+
+    //for query string for insertProjectData backend api
+    const projectName = e.target.projectName.value;
+    const parameterValues = [];
+    for (let i = 1; i <= parameters; i++) {
+      parameterValues.push(e.target[`parameter${i}`].value);
+    }
+
+    const queryString = `projectName=${encodeURIComponent(projectName)}&parameterValues=${encodeURIComponent(parameterValues.join(','))}`;
+    console.log('query string',queryString);
+
+    //insert link
+    let insertLink = `http://localhost:3001/backend/insertProjectData?projectName=${projectName}`;
+    parameterValues.forEach((value, index) => {
+      insertLink += `&${value}={insert value}`;
+    });
+    console.log('insertlink',insertLink)
+
+    const response1 = await axios.post('http://localhost:3001/backend/createproject',formData);
     console.log('formdata',formData);
-    if(response.status === 201)
+    if(response1.status === 201)
     {
       console.log("Project added to DB");
     }
@@ -76,20 +81,23 @@ const handleSubmit = async(e) =>
     {
       console.log("Failed to add project data");
     }
-    setFormData({
-        projectName: '',
-        email: '',
-        password: '',
-        parameters: 0,
-        parameterValues: []
-      });
+
+    const response2 = await axios.get(`http://localhost:3001/backend/insertProjectData?${queryString}`);
+    if(response2.status === 201)
+    {
+      console.log("second link success");
+    }
+    else
+    {
+      console.log("Failed");
+    }
+    window.alert(`Insert Link -> ${insertLink}`); // displays the insert link
   }
   catch(error)
   {
     console.log(error);
   }
 };
-
 
   return (
     <div className='p-4'>
@@ -109,7 +117,7 @@ const handleSubmit = async(e) =>
                 SKF
             </div>
             </Link>
-            <div className='rounded-md cursor-pointer hover:scale-110 text-lg p-1 text-center duration-200 bg-green-400 mt-4 text-white font-medium' onClick={handlePopup}>
+            <div className='rounded-md w-24 cursor-pointer hover:scale-110 text-lg p-1 text-center duration-200 bg-green-400 mt-4 text-white font-medium' onClick={handlePopup}>
                 {text}
             </div>
         </div>
@@ -123,15 +131,15 @@ const handleSubmit = async(e) =>
               <form className='text-xl font-light' onSubmit={handleSubmit}>
                 <div className='flex mb-2'>
                   <label htmlFor='project' className='w-1/2'>Project Name</label>
-                  <input type='text' id='project' name='projectName' autoComplete='off' required className='w-1/2 rounded-md px-2 border border-black' onChange={handleInputChange}></input>
+                  <input type='text' id='project' name='projectName' autoComplete='off' required className='w-1/2 rounded-md px-2 border border-black' ></input>
                 </div>
                 <div className='flex mb-2'>
                   <label htmlFor='email' className='w-1/2'>Email</label>
-                  <input type='text' id='email' name='email' autoComplete='off' className='border border-black px-2 w-1/2 rounded-md' onChange={handleInputChange}></input>
+                  <input type='text' id='email' name='email' autoComplete='off' className='border border-black px-2 w-1/2 rounded-md' ></input>
                 </div>
                 <div className='flex mb-2'>
                   <label htmlFor='password' className='w-1/2'>Password</label>
-                  <input type='password' id='password' name='password' className=' border border-black w-1/2 px-2 rounded-md' onChange={handleInputChange}></input>
+                  <input type='password' id='password' name='password' className=' border border-black w-1/2 px-2 rounded-md' ></input>
                 </div>
                 {/* parameters */}
                 <div className='flex mb-2'>
@@ -145,7 +153,7 @@ const handleSubmit = async(e) =>
                     (
                       <div className='flex mb-1' key={parameterIndex}>
                         <label className='w-1/2' htmlFor={`parameter${parameterIndex}`}>Parameter {parameterIndex}</label>
-                        <input type='text' id={`parameter${parameterIndex}`} name={`parameter${parameterIndex}`} autoComplete='off' className='border border-black w-1/2 rounded-md' onChange={handleInputChange}></input>
+                        <input type='text' id={`parameter${parameterIndex}`} name={`parameter${parameterIndex}`} autoComplete='off' className='border border-black w-1/2 rounded-md px-2' ></input>
                       </div>
                     ))}
                 </div>

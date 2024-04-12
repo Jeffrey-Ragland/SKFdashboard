@@ -2,6 +2,7 @@ import EmployeeModel from './models/EmpSchema.js';
 import sensorModel from './models/SensorSchema.js';
 import apiTokenModel from './models/ApiTokenSchema.js';
 import queryModel from './models/QueriesSchema.js';
+import projectModel from './models/ProjectSchema.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
@@ -265,36 +266,55 @@ export const query = (req,res) =>
     .catch(err => res.status(500).json({error: err.message}));
 };
 
-//project creation in dashadmin
-export const createProject = async (req,res) =>
+//add data -> dashadmin
+//creates collection named projects which includes projectName,email,password,parameters,parameterValues
+//password encryption is not done YET
+export const createProject = (req,res) =>
 {
 console.log('request body',req.body);
 {
-    try
-    {
-        const {projectName, email,password,parameterValues} = req.body;
-
-        const ProjectSchema = new mongoose.Schema({
-            //projectName: String,
-            email: String,
-            password: String,
-            parameters: Object
-        });
-        const ProjectModel = mongoose.model(projectName,ProjectSchema,projectName);
-        
-        const projectData = {
-            //projectName: projectName,
-            email: email,
-            password: password,
-            parameters: parameterValues
-        };
-
-        const project = new ProjectModel(projectData);
-        await project.save();
-        res.status(201).send(project);
-    }
-    catch(error)
-    {
-        res.status(400).send(error);
-    }
+        const {projectName, email,password,parameters,parameterValues} = req.body;
+        const newProject = new projectModel({projectName, email,password,parameters,parameterValues});
+        newProject.save()
+        .then(()=>
+        {
+        res.status(201).json({message: "Project stored"})
+        })
+        .catch(err => res.status(500).json({error: err.message}));  
 }};
+
+//schema is given outside the function to avoid creating db model repeatedly
+const projectDataSchema = new mongoose.Schema({
+    projectName: String
+});
+
+//creates a empty collection with the title of projectName
+//the generated insert link from the frontend after submitting the form is used to insert data into this collection
+//bearer token authentication is not done for the insert link YET
+export const insertProjectData = (req, res) => {
+    const projectName = req.query.projectName;
+    const parameterValues = Object.keys(req.query).filter(key => key !== 'projectName');
+
+    //creates dynamic schema
+    const dynamicSchema = {};
+    parameterValues.forEach(param => {
+        dynamicSchema[param] = String;
+    });
+
+    projectDataSchema.add(dynamicSchema);
+
+    const projectDataModel = mongoose.models[projectName] || mongoose.model(projectName, projectDataSchema, projectName);
+
+    //creates dynamic field according to parameterValues
+    const projectDataObject = {};
+    parameterValues.forEach(param => {
+        projectDataObject[param] = req.query[param];
+    });
+
+    const projectData = new projectDataModel(projectDataObject);
+    projectData.save()
+        .then(() => {
+            res.status(201).json({ message: "Project data stored" });
+        })
+        .catch(err => res.status(500).json({ error: err.message }));
+}
