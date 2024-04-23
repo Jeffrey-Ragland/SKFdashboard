@@ -2,10 +2,11 @@ import EmployeeModel from './models/EmpSchema.js';
 import sensorModel from './models/SensorSchema.js';
 import apiTokenModel from './models/ApiTokenSchema.js';
 import queryModel from './models/QueriesSchema.js';
-import projectModel from './models/ProjectSchema.js';
+//import projectModel from './models/ProjectSchema.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { name } from 'ejs';
 
 //http://localhost:3001/backend/signup
 export const signup = (req,res) =>
@@ -36,13 +37,21 @@ export const login = (req,res) =>
                     if(response)
                     {
                         let redirectUrl = '';
+                        let projectName = '';
                         if(user.Project === 'skf')
                         {
                             redirectUrl = '/dashmain';
+                            projectName = 'skf'
                         }
                         else if(user.Project === 'admin')
                         {
-                            redirectUrl = '/dashadmin'
+                            redirectUrl = '/dashadmin';
+                            projectName = 'admin';
+                        }
+                        else
+                        {
+                            redirectUrl = '/displayMain'
+                            projectName = user.Project;
                         }
                         // token generation
                         const token = jwt.sign({Email: user.Email}, "jwt-secret-key", {expiresIn:"1d"})
@@ -57,7 +66,7 @@ export const login = (req,res) =>
                             role = 'client';
                         }
                 
-                        res.json({token : token, role: role, redirectUrl: redirectUrl}); 
+                        res.json({token : token, role: role, redirectUrl: redirectUrl, projectName}); 
                     }
                     else
                     {
@@ -268,29 +277,32 @@ export const query = (req,res) =>
 
 //add data -> dashadmin
 //creates collection named projects which includes projectName,email,password,parameters,parameterValues
-//password encryption is not done YET
 export const createProject = (req,res) =>
 {
 console.log('request body',req.body);
 {
-        const {projectName, email,password,parameters,parameterValues} = req.body;
-        const newProject = new projectModel({projectName, email,password,parameters,parameterValues});
-        newProject.save()
-        .then(()=>
+        const {Project, Email,Password,Parameters,ParameterValues} = req.body;
+        bcrypt.hash(Password, 10)
+        .then(hash =>
         {
-        res.status(201).json({message: "Project stored"})
+            const newProject = new EmployeeModel({Project, Email,Password: hash,Parameters,ParameterValues});
+            newProject.save()
+            .then(()=>
+            {
+            res.status(201).json({message: "Project stored"})
+            })
+            .catch(err => res.status(500).json({error: err.message}));
         })
-        .catch(err => res.status(500).json({error: err.message}));  
+        .catch(err => console.log(err.message));    
 }};
 
 //schema is given outside the function to avoid creating db model repeatedly
 const projectDataSchema = new mongoose.Schema({
-    projectName: String
+    //projectName: String
 });
 
 //creates a empty collection with the title of projectName
 //the generated insert link from the frontend after submitting the form is used to insert data into this collection
-//bearer token authentication is not done for the insert link YET
 export const insertProjectData = (req, res) => {
     const projectName = req.query.projectName;
     const parameterValues = Object.keys(req.query).filter(key => key !== 'projectName');
@@ -317,4 +329,24 @@ export const insertProjectData = (req, res) => {
             res.status(201).json({ message: "Project data stored" });
         })
         .catch(err => res.status(500).json({ error: err.message }));
+}
+
+export const displayProjectData = async (req,res) => {
+    const {projectName} = req.body;
+    console.log('request body',req.body);
+    // const collectionFound = await mongoose.connection.db.listCollections({name: projectName}).next();
+    const collection = mongoose.connection.db.collection(projectName);
+    const projectData = await collection.find({}).sort({_id: -1}).toArray();
+    let result = '';
+        if (projectData.length > 0) 
+        {
+            console.log(`Collection ${projectName} found`);
+            console.log('projectdata', projectData);
+            res.json({ result: `Collection ${projectName} found`,success: true, data: projectData });
+        } 
+        else 
+        {
+            console.log(`Collection ${projectName} not found`);
+            result = `Collection ${projectName} not found`;
+        }
 }

@@ -9,7 +9,7 @@ const DashAdmin = () => {
 const handleLogout = () =>
 {
     localStorage.removeItem('token');
-    localStorage.removeItem('role');
+    localStorage.removeItem('Project');
 }
 
 const [popupOpen, setPopupOpen] = useState(false);
@@ -43,30 +43,30 @@ const handleSubmit = async(e) =>
   {
     //for createproject backend api
     const formData = {
-      projectName: e.target.projectName.value,
-      email: e.target.email.value,
-      password: e.target.password.value,
-      parameters: parameters,
-      parameterValues: []
+      Project: e.target.projectName.value,
+      Email: e.target.email.value,
+      Password: e.target.password.value,
+      Parameters: parameters,
+      ParameterValues: []
     };  
     for (let i = 1; i <= parameters; i++) 
     {
-      formData.parameterValues.push(e.target[`parameter${i}`].value);
+      formData.ParameterValues.push(e.target[`parameter${i}`].value);
     }
 
     //for query string for insertProjectData backend api
-    const projectName = e.target.projectName.value;
-    const parameterValues = [];
-    for (let i = 1; i <= parameters; i++) {
-      parameterValues.push(e.target[`parameter${i}`].value);
-    }
+    // const projectName = e.target.projectName.value;
+    // const parameterValues = [];
+    // for (let i = 1; i <= parameters; i++) {
+    //   parameterValues.push(e.target[`parameter${i}`].value);
+    // }
 
-    const queryString = `projectName=${encodeURIComponent(projectName)}&parameterValues=${encodeURIComponent(parameterValues.join(','))}`;
-    console.log('query string',queryString);
+    // const queryString = `projectName=${encodeURIComponent(projectName)}&parameterValues=${encodeURIComponent(parameterValues.join(','))}`;
+    // console.log('query string',queryString);
 
     //insert link
-    let insertLink = `http://localhost:3001/backend/insertProjectData?projectName=${projectName}`;
-    parameterValues.forEach((value, index) => {
+    let insertLink = `http://localhost:3001/backend/insertProjectData?projectName=${formData.Project}`;
+    formData.ParameterValues.forEach((value, index) => {
       insertLink += `&${value}={insert value}`;
     });
     console.log('insertlink',insertLink)
@@ -82,15 +82,15 @@ const handleSubmit = async(e) =>
       console.log("Failed to add project data");
     }
 
-    const response2 = await axios.get(`http://localhost:3001/backend/insertProjectData?${queryString}`);
-    if(response2.status === 201)
-    {
-      console.log("second link success");
-    }
-    else
-    {
-      console.log("Failed");
-    }
+    // const response2 = await axios.get(`http://localhost:3001/backend/insertProjectData?${queryString}`);
+    // if(response2.status === 201)
+    // {
+    //   console.log("second link success");
+    // }
+    // else
+    // {
+    //   console.log("Failed");
+    // }
     window.alert(`Insert Link -> ${insertLink}`); // displays the insert link
   }
   catch(error)
@@ -109,7 +109,7 @@ const handleSubmit = async(e) =>
                   <div onClick={handleLogout} className='h-10 mt-[2px] p-2 flex items-center rounded-lg bg-red-600 text-white  hover:scale-110 duration-200 font-medium'>
                       Logout
                   </div>
-              </Link>
+            </Link>
         </div>
         <div className='flex justify-between'>
             <Link to='/skfadmin'>
@@ -135,16 +135,16 @@ const handleSubmit = async(e) =>
                 </div>
                 <div className='flex mb-2'>
                   <label htmlFor='email' className='w-1/2'>Email</label>
-                  <input type='text' id='email' name='email' autoComplete='off' className='border border-black px-2 w-1/2 rounded-md' ></input>
+                  <input type='text' id='email' name='email' autoComplete='off' required className='border border-black px-2 w-1/2 rounded-md' ></input>
                 </div>
                 <div className='flex mb-2'>
                   <label htmlFor='password' className='w-1/2'>Password</label>
-                  <input type='password' id='password' name='password' className=' border border-black w-1/2 px-2 rounded-md' ></input>
+                  <input type='password' id='password' name='password' required className=' border border-black w-1/2 px-2 rounded-md' ></input>
                 </div>
                 {/* parameters */}
                 <div className='flex mb-2'>
                   <label htmlFor='param' className='w-1/2'>Parameters</label>
-                  <input type='number' id='param' name='parameters' className=' border border-black w-1/2 rounded-md px-2' value={parameters} onChange={handleParameters}></input>
+                  <input type='number' id='param' name='parameters' required className=' border border-black w-1/2 rounded-md px-2' value={parameters} onChange={handleParameters}></input>
                   
                 </div>
                 {/* dynamic parameter content */}
@@ -153,7 +153,7 @@ const handleSubmit = async(e) =>
                     (
                       <div className='flex mb-1' key={parameterIndex}>
                         <label className='w-1/2' htmlFor={`parameter${parameterIndex}`}>Parameter {parameterIndex}</label>
-                        <input type='text' id={`parameter${parameterIndex}`} name={`parameter${parameterIndex}`} autoComplete='off' className='border border-black w-1/2 rounded-md px-2' ></input>
+                        <input type='text' id={`parameter${parameterIndex}`} name={`parameter${parameterIndex}`} autoComplete='off' required className='border border-black w-1/2 rounded-md px-2' ></input>
                       </div>
                     ))}
                 </div>

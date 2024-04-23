@@ -12,7 +12,7 @@ const[nav, setNav] = useState(false);
 const handleLogout = () =>
 {
     localStorage.removeItem('token');
-    localStorage.removeItem('role');
+    localStorage.removeItem('Project');
 };
 
 return (

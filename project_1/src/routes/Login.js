@@ -28,6 +28,7 @@ const Login = () => {
               role: result.data.role
             });
             localStorage.setItem('token',tokenRole);
+            localStorage.setItem('Project',result.data.projectName);
             navigate(result.data.redirectUrl);
           }
           else{

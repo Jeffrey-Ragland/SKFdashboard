@@ -7,7 +7,12 @@ import DashReports from "./routes/DashReports";
 import DashSettings from "./routes/DashSettings";
 import DashAdmin from "./routes/DashAdmin";
 import SkfAdmin from "./routes/SkfAdmin";
+import DisplayMain from "./routes/DisplayMain";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
+import DisplayGraph from "./routes/DisplayGraph";
+import DisplayReport from "./routes/DisplayReport";
+import DisplayRoutePage from "./routes/DisplayRoutePage";
+import DisplaySettings from "./routes/DisplaySettings";
 
 
 function App() {
@@ -22,6 +27,11 @@ function App() {
           <Route path="dashgraph" element={<DashGraph />} />
           <Route path="dashreports" element={<DashReports />} />
           <Route path="dashsettings" element={<DashSettings />} />
+          <Route path="displayMain" element={<DisplayMain />} />
+          <Route path="displayGraph" element={<DisplayGraph />} />
+          <Route path="displayReport" element={<DisplayReport />} />
+          <Route path="displayRoutePage" element={<DisplayRoutePage />} />
+          <Route path="displaySettings" element={<DisplaySettings />} />
           <Route path="/" element={<ProtectedRoutes roleRequired='admin'/>}>
             <Route path="dashadmin" element={<DashAdmin />} />
             <Route path="skfadmin" element={<SkfAdmin />} />
