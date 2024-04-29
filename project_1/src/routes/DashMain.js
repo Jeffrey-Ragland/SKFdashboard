@@ -106,6 +106,9 @@ const DashMain = () => {
             const lastDataTimestamp = new Date(data[0].Time);
             const currentTime = new Date().getTime();
             const timeElapsed = (currentTime - lastDataTimestamp) / 1000;
+            console.log('last data time', lastDataTimestamp)
+            console.log('current time',currentTime)
+            console.log('time elapsed', timeElapsed)
 
         if(timeElapsed > 300)
         {
@@ -173,6 +176,7 @@ const DashMain = () => {
         [`Sensor 4`, sensorData[0].Sensor4],
         [`Sensor 5`, sensorData[0].Sensor5]
     ] : [];
+    //console.log('sensorData[0].Sensor5',sensorData.Sensor5)
   
     const pieOptions = {
       

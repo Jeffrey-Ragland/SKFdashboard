@@ -13,7 +13,8 @@ import {signup,
         query,
         createProject,
         insertProjectData,
-        displayProjectData} from './index.js';
+        displayProjectData,
+        displayProjectDataLimit} from './index.js';
 
 
 const router = express.Router();
@@ -33,5 +34,6 @@ router.post('/query',query); //dashSettings->customer support
 router.post('/createproject',createProject); //dashadmin->add data
 router.get('/insertProjectData',insertProjectData);
 router.post('/displayProjectData',displayProjectData);
+router.post('/displayProjectDataLimit',displayProjectDataLimit);
 
 export default router;

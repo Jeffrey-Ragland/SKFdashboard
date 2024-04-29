@@ -89,6 +89,7 @@ const SkfAdmin = () => {
         const response = await axios.get('http://localhost:3001/backend/read');
         if(response.data.success)
         {
+          console.log('response data',response.data.data)
             // for activity status
             const modifiedData = response.data.data.map(item =>
                 {
@@ -111,6 +112,7 @@ const SkfAdmin = () => {
                 });
             
                 checkStatus(modifiedData); 
+                console.log('modified data',modifiedData)
 
                 // for pdf download  
                 setPdfData(response.data.data);

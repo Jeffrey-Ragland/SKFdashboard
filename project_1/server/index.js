@@ -298,10 +298,9 @@ console.log('request body',req.body);
 
 //schema is given outside the function to avoid creating db model repeatedly
 const projectDataSchema = new mongoose.Schema({
-    //projectName: String
+    Time: String
 });
 
-//creates a empty collection with the title of projectName
 //the generated insert link from the frontend after submitting the form is used to insert data into this collection
 export const insertProjectData = (req, res) => {
     const projectName = req.query.projectName;
@@ -322,8 +321,12 @@ export const insertProjectData = (req, res) => {
     parameterValues.forEach(param => {
         projectDataObject[param] = req.query[param];
     });
+    
+    projectDataObject.Time = new Date().toLocaleString();
+    console.log('projectdata object',projectDataObject);
 
     const projectData = new projectDataModel(projectDataObject);
+    console.log('project data', projectData);
     projectData.save()
         .then(() => {
             res.status(201).json({ message: "Project data stored" });
@@ -333,15 +336,29 @@ export const insertProjectData = (req, res) => {
 
 export const displayProjectData = async (req,res) => {
     const {projectName} = req.body;
-    console.log('request body',req.body);
-    // const collectionFound = await mongoose.connection.db.listCollections({name: projectName}).next();
     const collection = mongoose.connection.db.collection(projectName);
     const projectData = await collection.find({}).sort({_id: -1}).toArray();
     let result = '';
         if (projectData.length > 0) 
         {
             console.log(`Collection ${projectName} found`);
-            console.log('projectdata', projectData);
+            res.json({ result: `Collection ${projectName} found`,success: true, data: projectData });
+        } 
+        else 
+        {
+            console.log(`Collection ${projectName} not found`);
+            result = `Collection ${projectName} not found`;
+        }
+}
+
+export const displayProjectDataLimit = async (req,res) => {
+    const {projectName, limit} = req.body;
+    const collection = mongoose.connection.db.collection(projectName);
+    const projectData = await collection.find({}).sort({_id: -1}).limit(limit).toArray();
+    let result = '';
+        if (projectData.length > 0) 
+        {
+            console.log(`Collection ${projectName} found`);
             res.json({ result: `Collection ${projectName} found`,success: true, data: projectData });
         } 
         else 
