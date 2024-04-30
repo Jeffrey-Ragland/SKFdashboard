@@ -20,8 +20,7 @@ const DisplayMain = () => {
     const [peakValues, setPeakValues] = useState([]); //peak value
     const [leftoverKeys, setLeftoverKeys] = useState(0); //total parameters
     const [limit, setLimit] = useState(25); //for line graph limit
-    const [selectedKey, SetSelectedKey] = useState(null); // line graph parameter selection
-
+    const [selectedKey, SetSelectedKey] = useState([]); // line graph parameter selection
 
     const handleLimitChange = (e) =>
     {
@@ -30,11 +29,18 @@ const DisplayMain = () => {
 
     const handleKeyClick = (key) =>
     {
-            SetSelectedKey(key);
+            //SetSelectedKey(key);
+            if(selectedKey.includes(key))
+            {
+                SetSelectedKey(selectedKey.filter((k) => k !== key));
+            }
+            else
+            {
+                SetSelectedKey([...selectedKey, key]);
+            }
             console.log('selected key name',key);   
     };
     
-
     useEffect(()=>
     {
         fetchProductData();
@@ -106,6 +112,14 @@ const DisplayMain = () => {
             console.log(error);
         }
     };
+
+    // useEffect(() => {
+    //     if (!selectedKey && projectDataLimit.length > 0) {
+    //         const keys = Object.keys(projectDataLimit[0])
+    //         .filter((key) =>  key !== '_id' && key !== '__v' && key !== 'Time');
+    //         SetSelectedKey(keys[0]);
+    //     }
+    // }, [projectDataLimit]);
     
     // for line graph
     const fetchProductDataLimit = async () =>
@@ -151,7 +165,7 @@ const DisplayMain = () => {
             const peakValues = findPeakValue(lastProjectData); // for peak value
             setPeakValues(peakValues);
 
-            const leftoverKeys = keysBeforeFilter.length - 3; //total parameters
+            const leftoverKeys = filteredkeys.length; //total parameters
             setLeftoverKeys(leftoverKeys);
         }
     }, [projectData]);
@@ -229,9 +243,27 @@ const DisplayMain = () => {
     //render line chart
     const renderLineChart = () =>
     {
-        const data = [['X', selectedKey]];
-        projectDataLimit.forEach((item, index) =>{
-            data.push([index + 1, parseFloat(item[selectedKey])]);
+        let keysToRender = selectedKey;
+        
+        // for default line graph
+        if (keysToRender.length === 0 && projectDataLimit.length > 0) {
+            const keys = Object.keys(projectDataLimit[0]).filter(
+                key => key !== '_id' && key !== '__v' && key !== 'Time'
+            );
+            keysToRender = [keys[0]];
+            SetSelectedKey(keysToRender);
+        }
+
+        const data = [['Time', ...keysToRender]];
+        projectDataLimit.forEach(item =>{
+            //const time = item.Time;
+            //data.push([time, parseFloat(item[selectedKey])]);
+            const lineData = [item.Time];
+            selectedKey.forEach((key) =>{
+                lineData.push(parseFloat(item[key] || 0));
+            });
+            data.push(lineData);
+            console.log('line data',lineData);
         });
 
         return(
@@ -243,10 +275,13 @@ const DisplayMain = () => {
             data = {data}
             options = {{
                 hAxis: {
-                    title: 'time',
+                    //title: '',
+                    textStyle:{
+                        fontSize: 6,
+                    },
                 },
                 vAxis: {
-                    title: selectedKey,
+                    title: '',
                 },
             }}
             rootProps = {{'data-testid' : '1'}}
@@ -346,27 +381,62 @@ const DisplayMain = () => {
                         </div>
                     </div>
                     <div className='sm:flex sm:h-[41vh] 2xl:h-[44vh] xxs:h-screen gap-4 mb-4'>
-                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full  mb-2 flex items-center justify-center bg-white shadow-lg'>
-                            N/A
+                        {/* table */}
+                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-2 bg-white shadow-xl overflow-auto' style={customScrollbarStyle}>
+                            <table className='w-full'>
+                                <thead className='sticky top-0 bg-teal-300'>
+                                    <tr>
+                                        <th className='border border-black'>S.No</th>
+                                        {
+                                            projectData.length > 0 && Object.keys(projectData[0])
+                                            .filter(key => key !== '_id' && key !== 'Time' && key !== '__v') 
+                                            .map((key) => (
+                                                <th key={key} className='border border-black'> {key} </th>
+                                            ))
+                                        }
+                                        <th className='border border-black'>Updated At</th>
+                                    </tr>
+                                </thead>
+                                <tbody className='text-xs'>
+                                    {
+                                        projectData
+                                        .map((item,index) => (
+                                            <tr key={index}>
+                                                <td className='border border-black text-center'>{index + 1}</td>
+                                                {Object.keys(item)
+                                                .filter(key => !['_id', 'Time', '__v'].includes(key))
+                                                .map((key, i) => (
+                                                    <td key={i} className='border border-black text-center'>{item[key]}</td>
+                                                ))}
+                                                <td className='border border-black text-center'>{item.Time}</td>
+                                            </tr>
+                                        ))
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                         {/* line graph */}
-                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-4 bg-white shadow-lg'>
-                            <div className='flex'>
-                                <div className='flex border border-black w-[70%] overflow-auto' style={{scrollbarWidth : 'none'}}>
+                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-4 bg-white shadow-xl p-2 '>
+                            <div className='flex gap-2 justify-around h-[10%]'>
+                                <div className='flex gap-2 w-[70%] overflow-auto' style={{scrollbarWidth : 'none'}}>
                                     {
                                         Object.keys(cardData)
                                         .filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-                                        .map(key => (
-                                            <div key={key} onClick={() =>handleKeyClick(key)} className='border border-black'>
-                                                {`${key}`}
+                                        .map((key,index) => (
+                                            <div key={key}  className=' text-gray-700 flex text-xs font-medium rounded-md'>
+                                                {/* <div className='rounded-full border border-black h-2 w-2 mt-[5px] mr-1'></div> */}
+                                                <input id={key} type='checkbox' className='cursor-pointer'
+                                                onClick={() =>handleKeyClick(key)}
+                                                checked={index === 0 && selectedKey.length === 0 ? true : selectedKey.includes(key)}></input>
+                                                <div className='flex items-center'>{`${key}`}</div>
                                             </div>
                                         ))
                                     }
                                 </div>
                                 {/* graph limit */}
-                                <div className='w-[30%] border border-black'>
-                                    <label htmlFor='limit'>LIMIT</label>
-                                    <select id='limit' value={limit} onChange={handleLimitChange}>
+                                <div className='flex justify-center items-center bg-red-500 p-1 rounded-md cursor-pointer hover:scale-105 duration-200'>
+                                    <label htmlFor='limit' className='text-xs text-white font-medium mr-1 cursor-pointer'>LIMIT</label>
+                                    <select id='limit' value={limit} onChange={handleLimitChange} className='text-xs bg-white rounded-2xl font-medium cursor-pointer'>
                                         <option value='25'>25</option>
                                         <option value='50'>50</option>
                                         <option value='75'>75</option>
@@ -375,7 +445,7 @@ const DisplayMain = () => {
                                 </div>
                             </div>
                             {/* render line graph */}
-                            <div className='border border-black'>
+                            <div className='h-[90%]'>
                                 {selectedKey && renderLineChart()}
                             </div>
                         </div>
