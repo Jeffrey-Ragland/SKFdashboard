@@ -5,7 +5,7 @@ import DisplaySidebar from '../components/dashboard/DisplaySidebar';
 const DisplayRoutePage = () => {
   return (
     <>
-        <div className='flex'>
+        <div className='flex h-screen'>
             {/* left side - sidebar */}
             <div>
                 <DisplaySidebar/> 

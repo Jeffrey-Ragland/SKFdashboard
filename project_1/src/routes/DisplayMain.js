@@ -22,11 +22,13 @@ const DisplayMain = () => {
     const [limit, setLimit] = useState(25); //for line graph limit
     const [selectedKey, SetSelectedKey] = useState([]); // line graph parameter selection
 
+    //line graph limit
     const handleLimitChange = (e) =>
     {
         setLimit(parseInt(e.target.value));
     };
 
+    //line graph
     const handleKeyClick = (key) =>
     {
             //SetSelectedKey(key);
@@ -426,7 +428,7 @@ const DisplayMain = () => {
                                             <div key={key}  className=' text-gray-700 flex text-xs font-medium rounded-md'>
                                                 {/* <div className='rounded-full border border-black h-2 w-2 mt-[5px] mr-1'></div> */}
                                                 <input id={key} type='checkbox' className='cursor-pointer'
-                                                onClick={() =>handleKeyClick(key)}
+                                                onChange={() =>handleKeyClick(key)}
                                                 checked={index === 0 && selectedKey.length === 0 ? true : selectedKey.includes(key)}></input>
                                                 <div className='flex items-center'>{`${key}`}</div>
                                             </div>

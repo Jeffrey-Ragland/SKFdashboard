@@ -17,12 +17,12 @@ const DisplaySidebar = () => {
 
     const location = useLocation();
   return (
-    <div className='flex flex-col bg-gray-600 h-screen text-gray-100'>
+    <div className='flex flex-col bg-gray-600 h-full text-gray-100'>
 
       <Link to='/displayMain' className={`h-1/5 p-2 hover:bg-gray-800 duration-200 flex items-center ${location.pathname === '/displayMain' && 'bg-gray-800'}`} onMouseEnter={()=> setDashHover(true)} onMouseLeave={()=>setDashHover(false)}>
         <div><RxDashboard size={25} /></div>
         {dashHover && (
-            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs'>
+            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs z-10'>
             Dashboard
             </div>
             )}
@@ -31,7 +31,7 @@ const DisplaySidebar = () => {
         <Link to='/displayGraph' className={`h-1/5 p-2 hover:bg-gray-800 duration-200 flex items-center ${location.pathname === '/displayGraph' && 'bg-gray-800'}`} onMouseEnter={()=> setGraphHover(true)} onMouseLeave={()=>setGraphHover(false)}>
         <div >< IoBarChartOutline size={25} /></div>
         {graphHover && (
-            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs'>
+            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs z-10'>
             Graphs
             </div>
             )}
@@ -40,7 +40,7 @@ const DisplaySidebar = () => {
         <Link to='/displayReport' className={`h-1/5 p-2 hover:bg-gray-800 duration-200 flex items-center ${location.pathname === '/displayReport' && 'bg-gray-800'}`} onMouseEnter={()=> setReportHover(true)} onMouseLeave={()=>setReportHover(false)}>
         <div ><GrDocumentDownload size={25} /></div>
         {reportHover && (
-            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs'>
+            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs z-10'>
             Reports
             </div>
             )}
@@ -49,7 +49,7 @@ const DisplaySidebar = () => {
         <Link to='/displayRoutePage' className={`h-1/5 p-2 hover:bg-gray-800 duration-200 flex items-center ${location.pathname === '/displayRoutePage' && 'bg-gray-800'}`} onMouseEnter={()=> setRouteHover(true)} onMouseLeave={()=>setRouteHover(false)}>
         <div ><TbRouteSquare size={25} /></div>
         {routeHover && (
-            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs'>
+            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs z-10'>
             Routes
             </div>
             )}
@@ -58,7 +58,7 @@ const DisplaySidebar = () => {
         <Link to='/displaySettings' className={`h-1/5 p-2 hover:bg-gray-800 duration-200 flex items-center ${location.pathname === '/displaySettings' && 'bg-gray-800'}`} onMouseEnter={()=> setSettingsHover(true)} onMouseLeave={()=>setSettingsHover(false)}>
         <div ><LiaToolsSolid size={25} /></div>
         {settingsHover && (
-            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs'>
+            <div className='absolute ml-9 bg-gray-600 p-1 rounded-full text-xs z-10'>
             Settings
             </div>
             )}
