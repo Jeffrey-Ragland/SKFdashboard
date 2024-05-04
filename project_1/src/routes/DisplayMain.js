@@ -295,12 +295,12 @@ const DisplayMain = () => {
     <>
         <div className='flex'>
             {/* left side - sidebar */}
-            <div>
+            <div className='lg:w-[3%]'>
                 <DisplaySidebar/> 
             </div>
 
             {/* right side */}
-            <div className='w-full'>
+            <div className='w-full lg:w-[97%]'>
 
                 {/* navbar */}
                 <div>
@@ -308,10 +308,10 @@ const DisplayMain = () => {
                 </div>
                 
                 {/* main content */}
-                <div className='px-2'>
-                    <div className='sm:flex sm:h-[41vh] 2xl:h-[44vh] xxs:h-screen gap-4 mb-4'>
+                <div className='px-2 h-[87%]'>
+                    <div className='sm:flex sm:h-[42vh] 2xl:h-[44vh] xxs:h-screen mb-3 gap-2'>
                         {/* parameter cards */}
-                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-2 grid grid-cols-3 gap-2 p-2 overflow-auto bg-white shadow-lg' style={customScrollbarStyle}>
+                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full grid grid-cols-3 gap-2 p-2 overflow-auto bg-white shadow-lg' style={{scrollbarWidth: 'none'}}>
                             {Object.keys(cardData)
                             .filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
                             .map(key =>(
@@ -320,9 +320,9 @@ const DisplayMain = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-4 flex gap-2'>
+                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full flex gap-2'>
                             {/* pie chart */}
-                            <div className='w-1/2 bg-white shadow-xl '>
+                            <div className='w-1/2 bg-white shadow-xl'>
                                 <div className='flex justify-center items-center  h-1/6'>
                                     <div className='mr-1'><AiOutlinePieChart size={25} /></div>
                                     <div className='font-medium '>
@@ -382,9 +382,9 @@ const DisplayMain = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='sm:flex sm:h-[41vh] 2xl:h-[44vh] xxs:h-screen gap-4 mb-4'>
+                    <div className='sm:flex sm:h-[42vh] 2xl:h-[44vh] xxs:h-screen gap-2 mb-[9px]'>
                         {/* table */}
-                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-2 bg-white shadow-xl overflow-auto' style={customScrollbarStyle}>
+                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full bg-white shadow-xl overflow-auto px-2' style={customScrollbarStyle}>
                             <table className='w-full'>
                                 <thead className='sticky top-0 bg-teal-300'>
                                     <tr>
@@ -418,7 +418,7 @@ const DisplayMain = () => {
                             </table>
                         </div>
                         {/* line graph */}
-                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-4 bg-white shadow-xl p-2 '>
+                        <div className='sm:w-1/2 xxs:h-1/2 sm:h-full bg-white shadow-xl p-2'>
                             <div className='flex gap-2 justify-around h-[10%]'>
                                 <div className='flex gap-2 w-[70%] overflow-auto' style={{scrollbarWidth : 'none'}}>
                                     {
