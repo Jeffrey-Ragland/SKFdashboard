@@ -8,60 +8,53 @@ import { AiOutlineLineChart } from "react-icons/ai";
 import ReactSlider from "react-slider";
 import { Chart } from "react-google-charts";
 import "chart.js/auto";
-import zoomPlugin from "chartjs-plugin-zoom";
-import { Chart as ChartJS} from 'chart.js';
-//import { color } from "html2canvas/dist/types/css/types/color";
-ChartJS.register(zoomPlugin);
 
 const DisplayGraph = () => {
-  const [checked, setChecked] = useState(false);
-  const [projectDataLimit, setProjectDataLimit] = useState([]);
-  const [filteredLineChartData, setFilteredLineChartData] = useState([]);
-  const [limit, setLimit] = useState(25);
-  const [selectedKey, SetSelectedKey] = useState([]);
-  const [barChartData, setBarChartData] = useState([]);
-  const [filteredBarChartData, setFilteredBarChartData] = useState([]);
-  const [barSliderValues, setBarSliderValues] = useState([0,100]);
-  const [lineSliderValues, setLineSliderValues] = useState([0, 100]);
-  const [lineColors, setLineColors] = useState([]);
+  const [checked, setChecked] = useState(false); //toggle button
+  const [projectDataLimit, setProjectDataLimit] = useState([]); //line data
+  const [filteredLineChartData, setFilteredLineChartData] = useState([]); // filtered line data
+  const [limit, setLimit] = useState(25); //line chart limit
+  const [selectedKey, SetSelectedKey] = useState([]); //line chart graph selection
+  const [barChartData, setBarChartData] = useState([]); //bar data
+  const [filteredBarChartData, setFilteredBarChartData] = useState([]); //filtered bar data
+  const [barSliderValues, setBarSliderValues] = useState([0, 100]); //bar chart slider
+  const [lineSliderValues, setLineSliderValues] = useState([0, 100]); //line chart slider
+  const [lineColors, setLineColors] = useState([]); //line chart colors
 
-  //Chart.register(CategoryScale);
+  //toggle button
   const handleToggle = () => {
     setChecked(!checked);
   };
 
-  const handleBarSliderChange = (value) =>
-  {
+  //bar chart slider
+  const handleBarSliderChange = (value) => {
     setBarSliderValues(value);
   };
   const barMinValue = barSliderValues[0];
   const barMaxValue = barSliderValues[1];
 
-  const handleLineSliderChange = (value) =>
-    {
-      setLineSliderValues(value);
-    }
-
-    const lineMinValue = lineSliderValues[0];
-    const lineMaxValue = lineSliderValues[1];
+  //line chart slider
+  const handleLineSliderChange = (value) => {
+    setLineSliderValues(value);
+  };
+  const lineMinValue = lineSliderValues[0];
+  const lineMaxValue = lineSliderValues[1];
 
   //line graph limit
   const handleLimitChange = (e) => {
     setLimit(parseInt(e.target.value));
   };
 
-  //line graph
+  //line graph selected graphs array
   const handleKeyClick = (key) => {
-    //SetSelectedKey(key);
     if (selectedKey.includes(key)) {
       SetSelectedKey(selectedKey.filter((k) => k !== key));
     } else {
       SetSelectedKey([...selectedKey, key]);
     }
-    //console.log("selected key name", key);
   };
 
-  //for line graph
+  //for line graph, bar chart
   useEffect(() => {
     fetchProductDataLimit();
     const interval = setInterval(fetchProductDataLimit, 2000);
@@ -70,7 +63,7 @@ const DisplayGraph = () => {
     };
   }, [limit]);
 
-  // for line graph, bar chart
+  // getting data from backend
   const fetchProductDataLimit = async () => {
     try {
       const projectName = localStorage.getItem("Project");
@@ -89,41 +82,28 @@ const DisplayGraph = () => {
     }
   };
 
-  useEffect(() =>
-  {
+  //line chart colors
+  useEffect(() => {
     setLineColors(getRandomColors(selectedKey.length));
-  },[selectedKey]);
+  }, [selectedKey]);
 
-  useEffect(() =>
-  {
-    const filteredLineChartData = projectDataLimit.filter(item =>
-      {
-        const value = parseFloat(item[selectedKey]);
-        return value >= lineMinValue && value <=lineMaxValue;
-      }
-    );
+  // filter line data based on slider value
+  useEffect(() => {
+    const filteredLineChartData = selectedKey.map((key) => {
+      return projectDataLimit.filter((item) => {
+        const value = parseFloat(item[key]);
+        return value >= lineMinValue && value <= lineMaxValue;
+      });
+    });
     setFilteredLineChartData(filteredLineChartData);
-  },[projectDataLimit, selectedKey, lineMinValue, lineMaxValue]);
+  }, [projectDataLimit, selectedKey, lineMinValue, lineMaxValue]);
 
-  console.log('line min value',lineMinValue);
-  console.log('line max value',lineMaxValue);
-  console.log('line chart data',projectDataLimit);
-  console.log('filtered line chart data',filteredLineChartData);
+  console.log("line min value", lineMinValue);
+  console.log("line max value", lineMaxValue);
+  console.log("line chart data", projectDataLimit);
+  console.log("filtered line chart data", filteredLineChartData);
 
-  // line chart y axis values
-  const generateLineYaxisTicks = () =>
-    {
-      const ticks = [];
-      for (let i = lineMinValue; i<= lineMaxValue; i +=4)
-        {
-          ticks.push(i);
-        }
-        console.log('ticks',ticks)
-        return ticks;
-    }
-    
-  const renderLineChart = () =>
-  {
+  const renderLineChart = () => {
     let keysToRender = selectedKey;
 
     // for default line graph
@@ -135,17 +115,25 @@ const DisplayGraph = () => {
       SetSelectedKey(keysToRender);
     }
 
+    const datasets = filteredLineChartData.map((dataForSingleKey, index) => ({
+      label: selectedKey[index],
+      data: dataForSingleKey.map((item) =>
+        parseFloat(item[selectedKey[index]] || 0)
+      ),
+      borderColor: lineColors[index],
+      fill: false,
+      pointStyle: "rectRounded",
+      pointRadius: 6,
+      pointBorderColor: "rgb(255, 0, 0)",
+      lineTension: 0.5,
+    }));
+
     const data = {
-      labels: projectDataLimit.map(item => item.Time),
-      datasets: selectedKey.map((key, index) => ({
-        label: key,
-        data: projectDataLimit.map(item => parseFloat(item[key] || 0)),
-        borderColor: lineColors[index], 
-        fill: false,
-        pointStyle: 'rectRounded',
-        pointRadius: 6,
-        pointBorderColor: 'rgb(255, 0, 0)'
-      }))
+      labels:
+        filteredLineChartData.length > 0
+          ? filteredLineChartData[0].map((item) => item.Time)
+          : [],
+      datasets: datasets,
     };
 
     const options = {
@@ -153,15 +141,18 @@ const DisplayGraph = () => {
       scales: {
         x: {
           ticks: {
+            stepSize: 1,
             font: {
               size: 6,
             },
           },
         },
         y: {
+          min: lineMinValue,
+          max: lineMaxValue,
           ticks: {
-            values: generateLineYaxisTicks(),
-            color:'red',
+            stepSize: 5,
+            color: "red",
           },
         },
       },
@@ -171,39 +162,17 @@ const DisplayGraph = () => {
           position: "right",
           usePointStyle: true,
         },
-        zoom: {
-          pan: {
-            enabled: true,
-            mode: "x",
-          },
-          limits: {
-            x: { min: 5, max: 7 },
-          },
-          zoom: {
-            pinch: {
-              enabled: true,
-            },
-            wheel: {
-              enabled: true,
-            },
-            mode: "x",
-          },
-        },
       },
     };
 
-    //console.log("data", data);
     return (
       <div className="h-full">
-        <Line
-          data={data}
-          height={"100%"}
-          options={options}
-        />
+        <Line data={data} height={"100%"} options={options} />
       </div>
     );
   };
 
+  //random color generation for line chart
   const getRandomColors = (count) => {
     const colors = [];
     for (let i = 0; i < count; i++) {
@@ -216,7 +185,7 @@ const DisplayGraph = () => {
     return colors;
   };
 
-  //bar chart code
+  //bar chart filtering for slider value 
   useEffect(() => {
     if (projectDataLimit.length > 0) {
       const lastProjectData = projectDataLimit[0];
@@ -239,44 +208,40 @@ const DisplayGraph = () => {
   }, [projectDataLimit]);
 
   // bar chart y axis values
-  const generateBarYAxisTicks = () =>
-  {
+  const generateBarYAxisTicks = () => {
     const ticks = [];
-    for (let i = barMinValue; i<= barMaxValue ;i+=4)
-    {
-        ticks.push(i);
+    for (let i = barMinValue; i <= barMaxValue; i += 4) {
+      ticks.push(i);
     }
     return ticks;
-  }
+  };
 
-  //console.log("bar chart data", barChartData);
-  //console.log("filtered bar chart data", filteredBarChartData);
-
+  console.log("bar chart data", barChartData);
+  
   const renderBarChart = () => {
-    
     return (
       <div className="h-full">
-            <Chart
-            width={"100%"}
-            height={"100%"}
-            chartType="ColumnChart"
-            loader={<div>Loading Chart</div>}
-            data={filteredBarChartData}
-            options={{
-              hAxis: {
-                title: "Parameters",
+        <Chart
+          width={"100%"}
+          height={"100%"}
+          chartType="ColumnChart"
+          loader={<div>Loading Chart</div>}
+          data={filteredBarChartData}
+          options={{
+            hAxis: {
+              title: "Parameters",
+            },
+            vAxis: {
+              ticks: generateBarYAxisTicks(),
+              textStyle: {
+                fontSize: 6,
               },
-              vAxis: {
-                ticks: generateBarYAxisTicks(),
-                textStyle: {
-                  fontSize: 6,
-                },
-              },
-              legend: {
-                position: "none",
-              }
-            }}
-          />
+            },
+            legend: {
+              position: "none",
+            },
+          }}
+        />
       </div>
     );
   };
@@ -381,25 +346,27 @@ const DisplayGraph = () => {
                 </div>
                 {/* render line graph */}
                 <div className="h-[94%] bg-white flex">
-                    <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
-                      <div>MAX</div>
-                      <ReactSlider
-                        className="w-10 h-[95%] flex justify-center items-center"
-                        thumbClassName="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
-                        trackClassName="w-1 rounded-full bg-gray-300"
-                        defaultValue={[0, 100]}
-                        renderThumb={(props, state) => (
-                          <div {...props}>{state.valueNow}</div>
-                        )}
-                        pearling
-                        minDistance={5}
-                        orientation="vertical"
-                        invert
-                        onChange={(value) => handleLineSliderChange(value)}
-                      />
-                      <div>MIN</div>
-                    </div>
-                  <div className="w-full">{selectedKey && renderLineChart()}</div>
+                  <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
+                    <div>MAX</div>
+                    <ReactSlider
+                      className="w-10 h-[95%] flex justify-center items-center"
+                      thumbClassName="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
+                      trackClassName="w-1 rounded-full bg-gray-300"
+                      defaultValue={[0, 100]}
+                      renderThumb={(props, state) => (
+                        <div {...props}>{state.valueNow}</div>
+                      )}
+                      pearling
+                      minDistance={5}
+                      orientation="vertical"
+                      invert
+                      onChange={(value) => handleLineSliderChange(value)}
+                    />
+                    <div>MIN</div>
+                  </div>
+                  <div className="w-full">
+                    {selectedKey && renderLineChart()}
+                  </div>
                 </div>
               </div>
             ) : (
