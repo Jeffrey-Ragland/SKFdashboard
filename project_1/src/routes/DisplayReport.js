@@ -18,50 +18,62 @@ import disclaimerPage from "./disclaimerPage.jpg";
 import { MultiSelect } from "react-multi-select-component";
 
 const DisplayReport = () => {
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [projectData, setProjectData] = useState([]);
-  const [modifiedData, setModifiedData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [fromDate, setFromDate] = useState(null); //from date in datepicker
+  const [toDate, setToDate] = useState(null); //to date in datepicker
+  const [projectData, setProjectData] = useState([]); //initial backend data
+  const [modifiedData, setModifiedData] = useState([]); //data with modified time format
+  const [filteredData, setFilteredData] = useState([]); //data filtered according to datepicker
+  //const [dropdownOptions, setDropDownOptions] = useState([]); //display options in dropdown
+  const [selectedOptions, setSelectedOptions] = useState([]); //selected options in dropdown
+  const [isOpen, setIsOpen] = useState(false);
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  //from date
   const handleFromDate = (date) => {
     setFromDate(date);
     console.log(date);
   };
 
+  //to date
   const handleToDate = (date) => {
     setToDate(date);
     console.log(date);
   };
 
-  //multi selector
-  const options = [
-    { label: "Sensor 1", value: 'Sensor 1' },
-    { label: "Sensor 2", value: 'Sensor 2' },
-    { label: "Sensor 3", value: 'Sensor 3' },
-    { label: "Sensor 4", value: 'Sensor 4' },
-    { label: "Sensor 5", value: 'Sensor 5' },
-    { label: "Sensor 6", value: 'Sensor 6' },
-    { label: "Sensor 7", value: 'Sensor 7' },
-    { label: "Sensor 8", value: 'Sensor 8' },
-    { label: "Sensor 9", value: 'Sensor 9' },
-    { label: "Sensor 10", value: 'Sensor 10' },
-    { label: "Sensor 11", value: 'Sensor 11' },
-    { label: "Sensor 12", value: 'Sensor 12' },
-    { label: "Sensor 13", value: 'Sensor 13' },
-    { label: "Sensor 14", value: 'Sensor 14' },
-    { label: "Sensor 15", value: 'Sensor 15' },
-  ];
+  //display dropdown options
+  // useEffect(() => {
+  //   if (filteredData.length > 0) {
+  //     const options = Object.keys(filteredData[0])
+  //       .filter((key) => key !== "_id" && key !== "Time" && key !== "__v")
+  //       .map((key) => ({ label: key, value: key }));
 
-  const handleMultiSelectorChange = selectedOptions =>
-  {
-    setSelectedOptions(selectedOptions);
-  }
+  //     setDropDownOptions(options);
+  //   }
+  // }, [filteredData]);
+
+  // //select dropdown options
+  // const handleMultiSelectorChange = (selectedOptions) => {
+  //   setSelectedOptions(selectedOptions);
+  // };
+  // console.log("dropdown options", dropdownOptions);
+  // console.log("multi selector selected options", selectedOptions);
+
+  //own dropdown code
+  const handleDropdownOptions = (key) => {
+    if (selectedOptions.includes(key)) {
+      setSelectedOptions(selectedOptions.filter((k) => k !== key));
+    } else {
+      setSelectedOptions([...selectedOptions, key]);
+    }
+  };
+  console.log('dropdown selected options', selectedOptions);
 
   useEffect(() => {
     fetchProductData();
-    const interval = setInterval(fetchProductData, 20000);
+    const interval = setInterval(fetchProductData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -110,8 +122,7 @@ const DisplayReport = () => {
     });
 
     setModifiedData(modified);
-    //console.log("modified data", modifiedData);
-
+    
     // filter the data from the backend according to datepicker
     const filtered = modified.filter((item) => {
       const projectDate = item.Time;
@@ -127,6 +138,7 @@ const DisplayReport = () => {
     console.log("filteredData", filtered);
   };
 
+  //download pdf
   const generatePdf = () => {
     const doc = new jsPDF();
     const logo = xymaimg;
@@ -138,7 +150,12 @@ const DisplayReport = () => {
     const headers = [
       "S.No",
       ...Object.keys(filteredData[0]).filter(
-        (key) => key !== "_id" && key !== "Time" && key !== "__v"
+        (key) =>
+          key !== "_id" &&
+          key !== "Time" &&
+          key !== "__v" &&
+          //selectedOptions.some((option) => option.value === key)
+          selectedOptions.includes(key)
       ),
       "Updated At",
     ];
@@ -150,7 +167,14 @@ const DisplayReport = () => {
       const rows = [
         index + 1,
         ...Object.keys(item)
-          .filter((key) => !["_id", "Time", "__v"].includes(key))
+          .filter(
+            (key) =>
+              key !== "_id" &&
+              key !== "Time" &&
+              key !== "__v" &&
+              //selectedOptions.some((option) => option.value === key)
+              selectedOptions.includes(key)
+          )
           .map((key) => item[key]),
         dateWithoutTimezone,
       ];
@@ -183,17 +207,35 @@ const DisplayReport = () => {
     doc.save(`${projectName}_reports.pdf`);
   };
 
-  // excel download code
+  //download excel
   const generateExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(filteredData);
+    const projectName = localStorage.getItem("Project");
+
+    const filteredDataForExcel = filteredData.map((item, index) => {
+      const filteredItem = {};
+      filteredItem["S.No"] = index + 1;
+      Object.keys(item).forEach((key) => {
+        if (selectedOptions.includes(key)) {
+          filteredItem[key] = item[key];
+        }
+      });
+      filteredItem["Time"] = item["Time"];
+      return filteredItem;
+    });
+
+    console.log("excel data", filteredDataForExcel);
+
+    const ws = XLSX.utils.json_to_sheet(filteredDataForExcel);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const info = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-    saveAs(info, "SensorData.xlsx");
+    saveAs(info, `${projectName}_report.xlsx`);
   };
+
+ 
 
   return (
     <>
@@ -206,13 +248,13 @@ const DisplayReport = () => {
         {/* right side */}
         <div className="w-full">
           {/* navbar */}
-          <div className="h-[13%]">
+          <div>
             <DisplayNavbar />
           </div>
 
           {/* main content */}
           <div className="h-[87%] flex items-center justify-center">
-            <div className="sm:w-[250px] md:w-[350px]  2xl:w-[400px] shadow-2xl bg-white">
+            <div className=" shadow-2xl bg-white">
               {/* top part */}
               <div className="text-sm  font-medium flex justify-between bg-gray-500 text-white">
                 <div className="p-2">Download Report</div>
@@ -229,16 +271,18 @@ const DisplayReport = () => {
                     <DatePicker
                       className="rounded-lg border border-black p-1"
                       selected={fromDate}
+                      name="fromdate"
                       onChange={handleFromDate}
                       dateFormat={"dd/MM/yyyy"}
                       showIcon
                     />
                   </div>
-                  <div>
+                  <div className="w-full">
                     <div className="mb-1 text-sm font-medium">To:</div>
                     <DatePicker
-                      className="rounded-lg border border-black"
+                      className="rounded-lg border border-black w-full"
                       selected={toDate}
+                      name="todate"
                       onChange={handleToDate}
                       dateFormat={"dd/MM/yyyy"}
                       showIcon
@@ -247,18 +291,62 @@ const DisplayReport = () => {
                 </div>
 
                 {/* multi selector */}
-                <div className="w-56">
+
+                {/* <div className="w-56">
                   <div className="text-sm font-medium mb-1">
                     Select Parameters
                   </div>
-                  <MultiSelect
-                    className="border border-black w-full h-32 overflow-auto"
-                    options={options}
-                    value={selectedOptions}
-                    onChange={handleMultiSelectorChange}
-                    labelledBy="Select"
-                    shouldToggleOnHover={true}
-                  />
+                  <div
+                    className="w-full h-20 overflow-auto"
+                    style={{ scrollbarWidth: "none" }}
+                  >
+                    <MultiSelect
+                      className="text-[12px]"
+                      options={dropdownOptions}
+                      value={selectedOptions}
+                      onChange={handleMultiSelectorChange}
+                      labelledBy="Select"
+                      disableSearch={true}
+                      overrideStrings={{
+                        allItemsAreSelected: "All parameters are selected",
+                      }}
+                    />
+                  </div>
+                </div> */}
+
+                <div className="bg-white border border-black rounded-md cursor-pointer w-full relative mt-2">
+                  <div
+                    onClick={toggleDropdown}
+                    className="text-sm p-2 text-gray-500"
+                  >
+                    Select Parameters
+                  </div>
+                  {isOpen && (
+                    <div
+                      className="w-full absolute top-10 left-0 h-20 overflow-auto bg-white border border-gray-400"
+                      style={{ scrollbarWidth: "none" }}
+                    >
+                      {Object.keys(projectData[0])
+                        .filter(
+                          (key) =>
+                            key !== "_id" && key !== "__v" && key !== "Time"
+                        )
+                        .map((key, index) => (
+                          <label
+                            key={key}
+                            className="flex gap-2 text-gray-700 text-xs font-medium p-2 hover:bg-gray-300 duration-200 cursor-pointer"
+                          >
+                            <input
+                              id={key}
+                              type="checkbox"
+                              className="cursor-pointer"
+                              onChange={() => handleDropdownOptions(key)}
+                            />
+                            <div>{`${key}`}</div>
+                          </label>
+                        ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-4">

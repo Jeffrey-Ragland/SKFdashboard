@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DisplayNavbar from "../components/dashboard/DisplayNavbar";
 import DisplaySidebar from "../components/dashboard/DisplaySidebar";
-import { Line } from "react-chartjs-2";
+import {Line } from "react-chartjs-2";
 import { AiOutlineBarChart } from "react-icons/ai";
 import { AiOutlineLineChart } from "react-icons/ai";
 import ReactSlider from "react-slider";
