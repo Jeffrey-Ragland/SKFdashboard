@@ -16,6 +16,7 @@ import xymaimg from "./xyma.png";
 import coverImg from "./pdfcover.jpg";
 import disclaimerPage from "./disclaimerPage.jpg";
 import { MultiSelect } from "react-multi-select-component";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
 const DisplayReport = () => {
   const [fromDate, setFromDate] = useState(null); //from date in datepicker
@@ -26,9 +27,12 @@ const DisplayReport = () => {
   //const [dropdownOptions, setDropDownOptions] = useState([]); //display options in dropdown
   const [selectedOptions, setSelectedOptions] = useState([]); //selected options in dropdown
   const [isOpen, setIsOpen] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
+    setSelectedOptions([]);
+    setSelectAll(false);
   };
 
   //from date
@@ -69,7 +73,20 @@ const DisplayReport = () => {
       setSelectedOptions([...selectedOptions, key]);
     }
   };
-  console.log('dropdown selected options', selectedOptions);
+  console.log("dropdown selected options", selectedOptions);
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedOptions([]);
+    } else {
+      setSelectedOptions(
+        Object.keys(projectData[0]).filter(
+          (key) => key !== "_id" && key !== "__v" && key !== "Time"
+        )
+      );
+    }
+    setSelectAll(!selectAll);
+  };
 
   useEffect(() => {
     fetchProductData();
@@ -122,7 +139,7 @@ const DisplayReport = () => {
     });
 
     setModifiedData(modified);
-    
+
     // filter the data from the backend according to datepicker
     const filtered = modified.filter((item) => {
       const projectDate = item.Time;
@@ -235,8 +252,6 @@ const DisplayReport = () => {
     saveAs(info, `${projectName}_report.xlsx`);
   };
 
- 
-
   return (
     <>
       <div className="flex h-screen">
@@ -290,7 +305,7 @@ const DisplayReport = () => {
                   </div>
                 </div>
 
-                {/* multi selector */}
+                {/* dropdown */}
 
                 {/* <div className="w-56">
                   <div className="text-sm font-medium mb-1">
@@ -314,18 +329,39 @@ const DisplayReport = () => {
                   </div>
                 </div> */}
 
-                <div className="bg-white border border-black rounded-md cursor-pointer w-full relative mt-2">
-                  <div
-                    onClick={toggleDropdown}
-                    className="text-sm p-2 text-gray-500"
-                  >
-                    Select Parameters
+                <div className="bg-white border border-black rounded-md cursor-pointer w-full mt-2">
+                  <div onClick={toggleDropdown} className="flex">
+                    <div
+                      className="text-sm p-2 text-gray-500 w-[180px] h-[34px] overflow-auto"
+                      style={{ scrollbarWidth: "none" }}
+                    >
+                      {selectedOptions.length === 0
+                        ? "Select Parameters"
+                        : selectedOptions.join(", ")}
+                    </div>
+                    <div className="flex items-center justify-center w-[37px] bg-gray-300 rounded-r-md">
+                      {isOpen ? (
+                        <IoIosArrowUp size={25} />
+                      ) : (
+                        <IoIosArrowDown size={25} />
+                      )}
+                    </div>
                   </div>
                   {isOpen && (
                     <div
-                      className="w-full absolute top-10 left-0 h-20 overflow-auto bg-white border border-gray-400"
+                      className="w-full h-24 overflow-auto bg-white"
                       style={{ scrollbarWidth: "none" }}
                     >
+                      <label className="flex hover:bg-gray-300 p-2 text-xs font-medium cursor-pointer gap-2 duration-200">
+                        <input
+                          type="checkbox"
+                          id="selectAll"
+                          className="cursor-pointer"
+                          checked={selectAll}
+                          onChange={handleSelectAll}
+                        />
+                        <label htmlFor="selectAll" className="cursor-pointer">Select All</label>
+                      </label>
                       {Object.keys(projectData[0])
                         .filter(
                           (key) =>
@@ -334,12 +370,20 @@ const DisplayReport = () => {
                         .map((key, index) => (
                           <label
                             key={key}
-                            className="flex gap-2 text-gray-700 text-xs font-medium p-2 hover:bg-gray-300 duration-200 cursor-pointer"
+                            className={`flex gap-2 text-gray-700 text-xs font-medium p-2 hover:bg-gray-300 duration-200 cursor-pointer ${
+                              selectAll
+                                ? "opacity-50  hover:bg-white cursor-not-allowed"
+                                : ""
+                            }`}
                           >
                             <input
                               id={key}
                               type="checkbox"
                               className="cursor-pointer"
+                              disabled={selectAll}
+                              checked={
+                                selectAll || selectedOptions.includes(key)
+                              }
                               onChange={() => handleDropdownOptions(key)}
                             />
                             <div>{`${key}`}</div>
