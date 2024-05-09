@@ -15,7 +15,6 @@ import { MdDownload } from "react-icons/md";
 import xymaimg from "./xyma.png";
 import coverImg from "./pdfcover.jpg";
 import disclaimerPage from "./disclaimerPage.jpg";
-import { MultiSelect } from "react-multi-select-component";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
 const DisplayReport = () => {
@@ -24,11 +23,11 @@ const DisplayReport = () => {
   const [projectData, setProjectData] = useState([]); //initial backend data
   const [modifiedData, setModifiedData] = useState([]); //data with modified time format
   const [filteredData, setFilteredData] = useState([]); //data filtered according to datepicker
-  //const [dropdownOptions, setDropDownOptions] = useState([]); //display options in dropdown
+  const [isOpen, setIsOpen] = useState(false); //dropdown
+  const [selectAll, setSelectAll] = useState(false); //select all option in dropdown
   const [selectedOptions, setSelectedOptions] = useState([]); //selected options in dropdown
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectAll, setSelectAll] = useState(false);
 
+  //dropdown
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
     setSelectedOptions([]);
@@ -47,25 +46,7 @@ const DisplayReport = () => {
     console.log(date);
   };
 
-  //display dropdown options
-  // useEffect(() => {
-  //   if (filteredData.length > 0) {
-  //     const options = Object.keys(filteredData[0])
-  //       .filter((key) => key !== "_id" && key !== "Time" && key !== "__v")
-  //       .map((key) => ({ label: key, value: key }));
-
-  //     setDropDownOptions(options);
-  //   }
-  // }, [filteredData]);
-
-  // //select dropdown options
-  // const handleMultiSelectorChange = (selectedOptions) => {
-  //   setSelectedOptions(selectedOptions);
-  // };
-  // console.log("dropdown options", dropdownOptions);
-  // console.log("multi selector selected options", selectedOptions);
-
-  //own dropdown code
+  //dropdown selected options
   const handleDropdownOptions = (key) => {
     if (selectedOptions.includes(key)) {
       setSelectedOptions(selectedOptions.filter((k) => k !== key));
@@ -75,6 +56,7 @@ const DisplayReport = () => {
   };
   console.log("dropdown selected options", selectedOptions);
 
+  //dropdown select all option
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedOptions([]);
@@ -161,8 +143,7 @@ const DisplayReport = () => {
     const logo = xymaimg;
     const cover = coverImg;
     const disclaimer = disclaimerPage;
-    const projectName = localStorage.getItem("Project");
-
+    
     //pdf table headers
     const headers = [
       "S.No",
@@ -171,7 +152,6 @@ const DisplayReport = () => {
           key !== "_id" &&
           key !== "Time" &&
           key !== "__v" &&
-          //selectedOptions.some((option) => option.value === key)
           selectedOptions.includes(key)
       ),
       "Updated At",
@@ -189,7 +169,6 @@ const DisplayReport = () => {
               key !== "_id" &&
               key !== "Time" &&
               key !== "__v" &&
-              //selectedOptions.some((option) => option.value === key)
               selectedOptions.includes(key)
           )
           .map((key) => item[key]),
@@ -221,7 +200,11 @@ const DisplayReport = () => {
 
     //disclaimer
     doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
-    doc.save(`${projectName}_reports.pdf`);
+    //doc.save(`${projectName}_reports.pdf`);
+
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl);
   };
 
   //download excel
@@ -307,28 +290,6 @@ const DisplayReport = () => {
 
                 {/* dropdown */}
 
-                {/* <div className="w-56">
-                  <div className="text-sm font-medium mb-1">
-                    Select Parameters
-                  </div>
-                  <div
-                    className="w-full h-20 overflow-auto"
-                    style={{ scrollbarWidth: "none" }}
-                  >
-                    <MultiSelect
-                      className="text-[12px]"
-                      options={dropdownOptions}
-                      value={selectedOptions}
-                      onChange={handleMultiSelectorChange}
-                      labelledBy="Select"
-                      disableSearch={true}
-                      overrideStrings={{
-                        allItemsAreSelected: "All parameters are selected",
-                      }}
-                    />
-                  </div>
-                </div> */}
-
                 <div className="bg-white border border-black rounded-md cursor-pointer w-full mt-2">
                   <div onClick={toggleDropdown} className="flex">
                     <div
@@ -360,7 +321,9 @@ const DisplayReport = () => {
                           checked={selectAll}
                           onChange={handleSelectAll}
                         />
-                        <label htmlFor="selectAll" className="cursor-pointer">Select All</label>
+                        <label htmlFor="selectAll" className="cursor-pointer">
+                          Select All
+                        </label>
                       </label>
                       {Object.keys(projectData[0])
                         .filter(
